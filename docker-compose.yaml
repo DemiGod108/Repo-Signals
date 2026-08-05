@@ -1,0 +1,14 @@
+include:
+  - ./airflow/docker-compose-airflow.yaml
+  - ./backend/docker-compose-backend.yaml
+
+services:
+  frontend:
+    container_name: frontend
+    image: nginx
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+
+    
