@@ -1,7 +1,7 @@
 import httpx
 import os
 import models
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
@@ -95,3 +95,25 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 	redirect_response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='lax')
 
 	return redirect_response
+
+@router.post("/refresh")
+def refresh_access_token(request: Request, db: Session=Depends(get_db)):
+	refresh_token = request.cookies.get("refresh_token")
+	if refresh_token:
+		hashed_rf = auth.hash_refresh_token(refresh_token)
+		refresh_token_obj = db.query(models.RefreshToken).filter(models.RefreshToken.token_hash == hashed_rf).first()
+	else:
+		raise HTTPException(detail="login again", status_code=status.HTTP_401_UNAUTHORIZED)
+	if refresh_token_obj:
+		if not refresh_token_obj.is_revoked and refresh_token_obj.expires_at > datetime.now(tz=UTC):
+			github_id = refresh_token_obj.user_id
+			new_access_token = auth.create_access_token({"sub": github_id})
+
+			response = Response(status_code=status.HTTP_200_OK, content="success")
+			response.set_cookie(key="access_token", value=new_access_token, httponly=True, secure=True, samesite='lax')
+			return response
+		else:
+			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="please login again")
+
+	else:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="user doesnt exist")
