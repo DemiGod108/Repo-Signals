@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from endpoints import users
 
 app = FastAPI()
+app.include_router(users.router)
 
 origins = [
 	"http://localhost:3000",
 ]
-
 app.add_middleware(
 	CORSMiddleware,
 	allow_origins=origins,
@@ -15,3 +16,12 @@ app.add_middleware(
 	allow_headers=["*"]
 )
 
+
+@app.get("/landing-page")
+def hello():
+	return "hello"
+
+@app.get("/dashboard")
+def dashboard():
+	return "dashboard"
+	
