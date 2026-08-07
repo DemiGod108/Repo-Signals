@@ -12,7 +12,7 @@ class Users(Base):
 	id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
 	github_id: Mapped[int] = mapped_column(index=True, primary_key=True, unique=True)
 	github_username: Mapped[str] = mapped_column()
-	ecrypted_github_access_token: Mapped[str] = mapped_column()
+	encrypted_github_access_token: Mapped[str] = mapped_column()
 
 class RefreshToken(Base):
 	__tablename__ = "refresh_tokens"

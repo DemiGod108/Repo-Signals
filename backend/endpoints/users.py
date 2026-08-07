@@ -36,12 +36,13 @@ github_client_secret = os.getenv("GITHUB_CLIENT_SECRET")
 async def github_auth():
 	return RedirectResponse(f"https://github.com/login/oauth/authorize?client_id={github_client_id}&redirect_uri={backend_url}/callback", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
-#github sends temporary code on authorizing my app
-#github returns error if user denies to authorize, then redirect user to landing page again
+#github sends temporary code on authorizing my app, github returns error if user denies to authorize
 @router.get("/callback")
 async def complete_auth(code: str | None = None, error: str | None = None, db: Session = Depends(get_db)):
+	#if user denies to authorize
 	if error:
-		return RedirectResponse(f"{backend_url}/landing-page")	#if user denies to authorize
+		response = Response(content="app not authorized", status_code=status.HTTP_401_UNAUTHORIZED)	
+		return response
 
 	#if they accept to authorize:
 	params={
@@ -56,45 +57,48 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 		response = await client.post(url="https://github.com/login/oauth/access_token", params=params, headers=headers)
 	data = response.json()
 
-	access_token = data['access_token']	#github access token
+	github_access_token = data['access_token']	#github access token
 	access_token_bytes = access_token.encode('utf-8')	#converting it into bytes inorder to encrypt it
 	encrypted_token = encrypt_decrypt.cipher.encrypt(access_token_bytes)	#encrypting the token
 
 
 	#sending get request to github api endpoint, to get github username and github numeric id
 	async with httpx.AsyncClient() as client:
-		headers.update({"Authorization": f'Bearer {access_token}'})
+		headers.update({"Authorization": f'Bearer {github_access_token}'})
 		response = await client.get("https://api.github.com/user", headers=headers)
 	data = response.json()
 
 	github_username = data['login']
 	github_id = data['id']
 
-	#if user had already authorized in the past, we just have to update the stored encrypted token, if we insert again, then we will end up with duplicate rows for the same user
+
 	user = db.query(models.Users).filter(models.Users.github_id == github_id).first()
-	if user:
-		user.ecrypted_github_access_token = encrypted_token
-		db.commit()
-	else:		
-		db.add(models.Users(github_id=github_id, github_username=github_username, ecrypted_github_access_token=encrypted_token))
-		db.flush()
 
-		access_token = auth.create_access_token({"sub": github_id}) #access token issued by fastapi
+	#we need new access token and refresh tokens regardless of whether its a returning user or new user
+	access_token = auth.create_access_token({"sub": github_id}) #access token issued by fastapi
+	refresh_token = auth.create_refresh_token()
+	hashed_rf = auth.hash_refresh_token(refresh_token)
 
-		refresh_token = auth.create_refresh_token()
-		hashed_rf = auth.hash_refresh_token(refresh_token)
-
+	#for returning users, update the ecrypted gitub_access_token AND also store the new refresh token in db
+	if user: 
+		user.encrypted_github_access_token = encrypted_token
 		db.add(models.RefreshToken(user_id=github_id, token_hash=hashed_rf, created_at=datetime.now(tz=UTC), expires_at=datetime.now(tz=UTC)+timedelta(days=20), is_revoked=False))
-
 		db.commit()
 
-	redirect_response = RedirectResponse(f"{backend_url}/dashboard") #after authorizing my app (regardless of whether they are returning user or new user) redirect them to dashboard page
+	#handling new users
+	else:		
+		db.add(models.Users(github_id=github_id, github_username=github_username, encrypted_github_access_token=encrypted_token))
+		db.flush()
+		db.add(models.RefreshToken(user_id=github_id, token_hash=hashed_rf, created_at=datetime.now(tz=UTC), expires_at=datetime.now(tz=UTC)+timedelta(days=20), is_revoked=False))
+		db.commit()
+
+	success_resp = Response(content="use successfully authenticated", status_code=status.HTTP_200_OK)
 
 	#once authorized we set the cookies
-	redirect_response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='lax')
-	redirect_response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='lax')
+	success_resp.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='lax')
+	success_resp.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='lax')
 
-	return redirect_response
+	return success_resp
 
 @router.post("/refresh")
 def refresh_access_token(request: Request, db: Session=Depends(get_db)):
@@ -117,3 +121,26 @@ def refresh_access_token(request: Request, db: Session=Depends(get_db)):
 
 	else:
 		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="user doesnt exist")
+
+
+@router.post("/logout")
+def logout(request: Request, response: Response, db: Session = Depends(get_db)):
+	ref_token = request.cookies.get("refresh_token")
+
+	if ref_token:
+		response.delete_cookie("refresh_token")
+		response.delete_cookie("access_token")
+
+		hashed_Ref_token = auth.hash_refresh_token(ref_token)
+		ref_token_obj = db.query(models.RefreshToken).filter(models.RefreshToken.token_hash == hashed_Ref_token).first()
+		if ref_token_obj:
+			ref_token_obj.is_revoked = True
+			db.commit()
+			response = Response(content="logged out successfully", status_code=status.HTTP_200_OK)
+			return response
+		else:
+			response = Response(content="session expired", status_code=status.HTTP_401_UNAUTHORIZED)
+			return response
+	else:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="login first")
+

@@ -17,11 +17,7 @@ app.add_middleware(
 )
 
 
-@app.get("/landing-page")
+@app.get("/")
 def hello():
 	return "hello"
-
-@app.get("/dashboard")
-def dashboard():
-	return "dashboard"
 	
