@@ -1,15 +1,13 @@
 from datetime import datetime, timedelta, timezone
 from utils.config import settings
 import jwt
-from pwdlib import PasswordHash
 import secrets
+import hashlib
 
-refresh_token_hash = PasswordHash.recommended()
+
 def hash_refresh_token(refresh_token: str):
-	return refresh_token_hash.hash(refresh_token)
-
-def verify_refresh_token(plain_refresh_token, hashed_refresh_token):
-	return refresh_token_hash.verify(plain_refresh_token, hashed_refresh_token)
+	hashed = hashlib.sha256(refresh_token.encode()).hexdigest()
+	return hashed
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
