@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from endpoints import users
+from endpoints import users, webhook_setter, producer
 
 app = FastAPI()
 app.include_router(users.router)
+app.include_router(webhook_setter.router)
+app.include_router(producer.router)
 
 origins = [
 	"http://localhost:3000",

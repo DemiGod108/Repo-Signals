@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from database import sessionLocal, engine
 from utils import auth
 from utils import encrypt_decrypt
-from utils.config import settings
+from utils.config import backend_url
 from datetime import datetime, UTC, timedelta
 
 models.Base.metadata.create_all(bind=engine)
@@ -21,10 +21,6 @@ def get_db():
 	finally:
 		db.close()
 
-if settings.development:
-	backend_url="http://127.0.0.1:8000"
-else:
-	backend_url=''
 
 router = APIRouter()
 
@@ -34,7 +30,8 @@ github_client_secret = os.getenv("GITHUB_CLIENT_SECRET")
 
 @router.get("/github-auth")
 async def github_auth():
-	return RedirectResponse(f"https://github.com/login/oauth/authorize?client_id={github_client_id}&redirect_uri={backend_url}/callback", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+	#require scope to be set to repo, so that the backend can access private and public repos and setup webhooks
+	return RedirectResponse(f"https://github.com/login/oauth/authorize?client_id={github_client_id}&redirect_uri={backend_url}/callback&scope=repo", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 #github sends temporary code on authorizing my app, github returns error if user denies to authorize
 @router.get("/callback")
@@ -58,8 +55,9 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 	data = response.json()
 
 	github_access_token = data['access_token']	#github access token
-	access_token_bytes = github_access_token.encode('utf-8')	#converting it into bytes inorder to encrypt it
-	encrypted_token = encrypt_decrypt.cipher.encrypt(access_token_bytes)	#encrypting the token
+	access_token_bytes = github_access_token.encode('utf-8')#converting it into bytes inorder to encrypt it
+	encrypted_token = encrypt_decrypt.cipher.encrypt(access_token_bytes).decode('utf-8')
+	#encrypting the token, need to convert back to string because .encrypt() returns bytes and this causes hex mismatch while storing in the db
 
 
 	#sending get request to github api endpoint, to get github username and github numeric id
@@ -70,12 +68,12 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 
 	github_username = data['login']
 	github_id = data['id']
-
+	github_id_str = str(github_id) #converting github_id to type string from type int, because sub needs to be of type string while jwt encodes the data
 
 	user = db.query(models.Users).filter(models.Users.github_id == github_id).first()
 
 	#we need new access token and refresh tokens regardless of whether its a returning user or new user
-	access_token = auth.create_access_token({"sub": github_id}) #access token issued by fastapi
+	access_token = auth.create_access_token({"sub": github_id_str}) #access token issued by fastapi
 	refresh_token = auth.create_refresh_token()
 	hashed_rf = auth.hash_refresh_token(refresh_token)
 
