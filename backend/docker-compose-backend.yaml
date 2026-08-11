@@ -45,9 +45,24 @@ services:
 
       KAFKA_LOG_DIRS: /var/lib/kafka/data
 
-
     volumes:
       - kafka_kraft:/var/lib/kafka/data
+
+  consumer:
+    build: .
+    command: [ "python", "./workers/consumer.py" ]
+
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: backend_db
+
+    volumes:
+      - .:/app
+    depends_on:
+      - kafka
+      - database
+    
 
 volumes:
   kafka_kraft:
