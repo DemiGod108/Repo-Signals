@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from confluent_kafka import Producer
 import json
 
+#location of bootstrap server, client (python) connects to this broker first to get info about other brokers
 producer_config= {
 	"bootstrap.servers": "kafka:9092"
 }
@@ -18,6 +19,7 @@ def ack(error, msg):
 
 router = APIRouter()
 
+#saving the github payload into kafka, and this is the kafka producer
 @router.post("/webhook-payload")
 async def webhook_payload(request: Request):
 	payload = await request.json()
@@ -25,6 +27,7 @@ async def webhook_payload(request: Request):
 	repo_name = payload["repository"]["name"]
 	event = request.headers.get("X-Github-Event")
 
+	#the kafka record should be in bytes so doing the following
 	kafka_record = json.dumps(payload).encode('utf-8')
 
 	print("route hit")

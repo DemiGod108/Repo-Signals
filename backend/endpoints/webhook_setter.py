@@ -38,7 +38,7 @@ async def setup_webhooks(repo_name: SelectRepo, user: Users = Depends(get_curren
 				"content_type": "json",
 				"insecure_ssl": "0"
 			},
-			"events": ["push", "pull_request", "fork", "issues"]
+			"events": ["push", "pull_request", "pull_request_review", "fork", "issues", "issue_comment"]
 		}
 		#setting up webhooks
 		async with httpx.AsyncClient() as client:
