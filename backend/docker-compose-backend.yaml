@@ -50,7 +50,7 @@ services:
 
   consumer:
     build: .
-    command: [ "python", "./workers/consumer.py" ]
+    command: [ "python", "-m", "workers.consumer" ]
 
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

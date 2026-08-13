@@ -5,13 +5,13 @@ from fastapi import APIRouter, status, Depends, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-from database import sessionLocal, engine
+from database import sessionLocal
 from utils import auth
 from utils import encrypt_decrypt
 from utils.config import backend_url
 from datetime import datetime, UTC, timedelta
 
-models.Base.metadata.create_all(bind=engine)
+
 load_dotenv()
 
 def get_db():

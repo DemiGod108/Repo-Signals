@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from endpoints import users, webhook_setter, producer
+import models
+from database import engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(users.router)
