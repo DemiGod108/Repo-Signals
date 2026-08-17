@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from datetime import datetime
 from sqlalchemy import DateTime
 from sqlalchemy.types import JSON
@@ -39,3 +39,15 @@ class EventData(Base):
 	repo_id: Mapped[int] = mapped_column()
 	trigger_event: Mapped[str] = mapped_column()
 	event_occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+class TrackedRepo(Base):
+	__tablename__ = "tracked_repo"
+
+	id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
+	repo_id: Mapped[int] = mapped_column()
+	repo_name: Mapped[str] = mapped_column()
+	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
+
+	__table_args__ = (
+			UniqueConstraint("user_id", "repo_id", name="unq_user_repo")
+	)
