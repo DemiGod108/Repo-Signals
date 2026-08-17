@@ -29,14 +29,12 @@ killer = GracefulKiller()
 while not killer.kill_now:
 	msg = consumer.poll(1.0)
 	if msg is None:
-		print("no msg")
 		continue
 	if msg.error():
 		print(f"Error: {msg.error()}")
 		continue
 
 	header = msg.headers() #header is a list of tuple basically it will be in [('event', b'push')] format
-	print(header)
 	value = msg.value().decode('utf-8')
 	payload = json.loads(value)
 
