@@ -4,17 +4,10 @@ import secrets
 import hashlib
 from datetime import datetime, timedelta, timezone
 from utils.config import settings
-from database import sessionLocal
+from database import get_db
 from sqlalchemy.orm import Session
 from models import Users
 from fastapi import Request, Depends, HTTPException, status
-
-def get_db():
-	db = sessionLocal()
-	try:
-		yield db
-	finally:
-		db.close()
 
 
 def hash_refresh_token(refresh_token: str):
