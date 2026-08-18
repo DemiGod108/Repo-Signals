@@ -6,7 +6,7 @@ from schemas import SelectRepo
 from utils.auth import get_current_user
 from utils.encrypt_decrypt import cipher
 from utils.config import backend_ngrok
-from utils.db_session import get_db
+from database import get_db
 from sqlalchemy.orm import Session
 from models import TrackedRepo
 

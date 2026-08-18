@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from pathlib import Path
 import os
 
 db_password = os.getenv("POSTGRES_PASSWORD")
@@ -10,3 +9,10 @@ db_user = os.getenv("POSTGRES_USER")
 engine = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@database:5432/backend_db")
 
 sessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+	db = sessionLocal()
+	try:
+		yield db
+	finally:
+		db.close()
