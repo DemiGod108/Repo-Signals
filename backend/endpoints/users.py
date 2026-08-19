@@ -93,8 +93,8 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 	success_resp = Response(content="user successfully authenticated", status_code=status.HTTP_200_OK)
 
 	#once authorized we set the cookies
-	success_resp.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='lax')
-	success_resp.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='lax')
+	success_resp.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='none')
+	success_resp.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='none')
 
 	return success_resp
 

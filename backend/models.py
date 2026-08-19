@@ -49,5 +49,5 @@ class TrackedRepo(Base):
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
 
 	__table_args__ = (
-			UniqueConstraint("user_id", "repo_id", name="unq_user_repo")
+			UniqueConstraint("user_id", "repo_id", name="unq_user_repo"),
 	)
