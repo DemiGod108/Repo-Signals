@@ -31,7 +31,7 @@ async def live_feed_consumer():
 			event_type = header[0][1].decode('utf-8')
 
 			payload = json.loads(msg.value().decode('utf-8'))
-			repo_id = payload["repository"]["id"]
+			repo_id = payload.get("repository", {}).get("id")
 
 			if not repo_id:
 				continue 
