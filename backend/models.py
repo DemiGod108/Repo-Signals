@@ -60,4 +60,4 @@ class ActiveRepoItems(Base):
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id", ondelete="CASCADE"))
 	repo_id: Mapped[int] = mapped_column()
 	item_num: Mapped[int] = mapped_column()
-	event_type: Mapped[int] = mapped_column()
+	event_type: Mapped[str] = mapped_column()
