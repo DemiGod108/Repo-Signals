@@ -15,7 +15,7 @@ consumer.subscribe(["^[0-9]+-[a-zA-Z0-9._-]+$"])
 
 async def live_feed_consumer():
 	try:
-		while True:	#consumer.poll() is synchronous, since we assign it a different thread where it can run independently without blocking the event loop
+		while True:	#consumer.poll() is synchronous, hence we assign it a different thread where it can run independently without blocking the event loop
 			msg = await asyncio.to_thread(consumer.poll, 1)
 
 			if msg is None:
