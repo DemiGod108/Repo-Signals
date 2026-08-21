@@ -51,3 +51,13 @@ class TrackedRepo(Base):
 	__table_args__ = (
 			UniqueConstraint("user_id", "repo_id", name="unq_user_repo"),
 	)
+
+#need the table for tracking number of open prs and issues
+class ActiveRepoItems(Base):
+	__tablename__ = "active_repo_items"
+
+	id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
+	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id", ondelete="CASCADE"))
+	repo_id: Mapped[int] = mapped_column()
+	item_num: Mapped[int] = mapped_column()
+	event_type: Mapped[int] = mapped_column()
