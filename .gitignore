@@ -6,3 +6,5 @@ __pycache__/
 
 airflow/logs/
 *.db
+
+airflow/seeder/

@@ -3,7 +3,7 @@ from airflow.timetables.trigger import CronTriggerTimetable
 from airflow.sdk.bases.hook import BaseHook
 from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timedelta
 from backend.models import EventData
 
 
@@ -20,7 +20,7 @@ def etl_dag():
 	#catching all the key value pairs passed by the executor using **kwargs
 	def extract_github_payload(**kwargs):
 		#start_date and end_date both are of the type pendulum.DateTime, i dont have to convert these into any other form for querying db cause pendulum.DateTime is inherting from the class datetime (from the stdlib datetime module) and the EventData table stores data in datetime format
-		start_date = kwargs['data_interval_start']
+		start_date = kwargs['data_interval_end'] - timedelta(days=28) #i am not implementing incremental load, hence my window will be 28 days before interval end (this window will shift nightly as interval_end keeps shifting forwards)
 		end_date = kwargs['data_interval_end']
 
 		#reading connection url from env (BaseHook.get() checks env variables first and then airflow's meta db)
@@ -64,8 +64,8 @@ def etl_dag():
 		return per_repo_data
 
 	@task
-	def perform_analytics(interval_event_data):
-		print(interval_event_data)
+	def perform_analytics(per_repo_data):
+		print(per_repo_data) 
 
 	@task
 	def store_health_metric():
