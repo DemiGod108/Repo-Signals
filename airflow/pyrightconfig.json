@@ -1,0 +1,8 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "typeCheckingMode": "standard",
+  "extraPaths": [".."],
+  "reportAbstractUsage": "none",
+  "reportUnusedExpression": "none"
+}

@@ -44,7 +44,7 @@ def etl_dag():
 
 		#since the EventData has payload data of multiple repos, i will need to calculate the metrics for each repo. interval_event_data is basically all the rows from EventData falling in that time and date range, but then i need to calculate those metrics per repo, so doing the following
 
-		per_repo_data = {}
+		per_repo_event_data = {}
 		#basically storing all the rows i got from EventData table and attaching them into respective repositories (repo_id basically)
 		for row in interval_event_data:
 			info_dict = {}
@@ -56,16 +56,41 @@ def etl_dag():
 			info_dict["trigger_event"] = row.trigger_event
 
 			#the column, event_occured_at is of type datetime and airflow parses the XCOMs into json, but it wont be able to parse datetime object, hence converting it into string first, making it json safe
-			event_occured_at = row.event_occurred_at.isoformat()
-			info_dict["event_occured_at"] = event_occured_at
-			per_repo_data.setdefault(row.repo_id, []).append(info_dict)
+			event_occurred_at = row.event_occurred_at.isoformat()
+			info_dict["event_occurred_at"] = event_occurred_at
+			per_repo_event_data.setdefault(row.repo_id, []).append(info_dict)
 
 
-		return per_repo_data
+		return per_repo_event_data
 
 	@task
-	def perform_analytics(per_repo_data):
-		print(per_repo_data) 
+	def perform_analytics(per_repo_event_data):
+		health_metric_dto = {}
+
+		for repo_id, event_list in per_repo_event_data.items():
+			daily_count={} #{date (event occured at): number of events} this event includes all the events that the webhook subscribed to
+			for event in event_list:
+				event_dt = datetime.fromisoformat(event["event_occurred_at"]).date()
+				daily_count[event_dt] = daily_count.get(event_dt, 0) + 1
+
+			sorted_dates = sorted(daily_count.keys())
+			today = sorted_dates[-1]
+			rolling_baseline_dates = sorted_dates[:-1] #everything except the latest day
+
+			baseline_tot = 0
+			for baseline in rolling_baseline_dates:
+				baseline_tot += daily_count.get(baseline, 0)
+			baseline_avg = baseline_tot / len(rolling_baseline_dates)
+
+			todays_activity_count = daily_count[today]
+			if todays_activity_count > baseline_avg * 1.5:
+				status = "spike"
+			elif todays_activity_count < baseline_avg * 0.5:
+				status = "decline"
+			else:
+				status = "normal"
+
+			health_metric_dto.setdefault(repo_id, []).append(status)
 
 	@task
 	def store_health_metric():
