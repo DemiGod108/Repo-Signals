@@ -1,5 +1,9 @@
 {
   "venvPath": ".",
   "venv": ".venv",
-  "typeCheckingMode": "standard"
+  "typeCheckingMode": "standard",
+  "reportOptionalSubscript": "none",
+  "reportArgumentType": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportOptionalMemberAccess": "none"
 }

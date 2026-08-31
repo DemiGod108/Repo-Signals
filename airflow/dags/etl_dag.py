@@ -80,15 +80,20 @@ def etl_dag():
 			baseline_tot = 0
 			for baseline in rolling_baseline_dates:
 				baseline_tot += daily_count.get(baseline, 0)
-			baseline_avg = baseline_tot / len(rolling_baseline_dates)
 
-			todays_activity_count = daily_count[today]
-			if todays_activity_count > baseline_avg * 1.5:
-				status = "spike"
-			elif todays_activity_count < baseline_avg * 0.5:
-				status = "decline"
+			if len(rolling_baseline_dates) == 0:
+				status = "insufficient_data"
+
 			else:
-				status = "normal"
+				baseline_avg = baseline_tot / len(rolling_baseline_dates)
+
+				todays_activity_count = daily_count[today]
+				if todays_activity_count > baseline_avg * 1.5:
+					status = "spike"
+				elif todays_activity_count < baseline_avg * 0.5:
+					status = "decline"
+				else:
+					status = "normal"
 
 			health_metric_dto.setdefault(repo_id, []).append(status)
 
