@@ -63,28 +63,32 @@ def etl_dag():
 			event_occurred_at = row.event_occurred_at.isoformat()
 			metric_dto["event_occurred_at"] = event_occurred_at
 
-			#adding relevant fields from the payload itself:
+			#adding relevant fields to dto from the payload itself:
 
 			if row.trigger_event == 'push':
 				#as per github webhooks, push event is also triggered when a branch is deleted and when a branch is deleted, the 'commits' key of the payload will be empty, also we must not count deleting a branch towards bus factor
-				if row.payload["commits"]:
+				if row.payload.get("commits"):
 					for commit in row.payload.get("commits"): #list of dictionary (list of commit objects) 
-						name = commit["author"]["name"]
+						name = commit.get("author", {}).get("name")
 						metric_dto["authors"].append(name)
 						
 
 			elif row.trigger_event == 'pull_request':
-				metric_dto["action"] = row.payload["action"]
-				metric_dto["item_number"] = row.payload["pull_request"]["number"]
+				metric_dto["action"] = row.payload.get("action")
+				metric_dto["item_number"] = row.payload.get("pull_request", {}).get("number")
 
-				if row.payload["action"] == 'closed':
-					metric_dto["is_merged"] = row.payload["pull_request"]["merged"]
+				if row.payload.get("action") == 'closed':
+					metric_dto["is_merged"] = row.payload.get("pull_request", {}).get("merged")
  
 
 			elif row.trigger_event == 'pull_request_review':
-				metric_dto["action"] = row.payload["action"] #realistically we are only concerned with 'submitted' action of the pull_request_review event, since submit represents the true first time the maintainer reviewed the pr
-				metric_dto["item_number"] = row.payload["pull_request"]["number"]
+				metric_dto["action"] = row.payload.get("action") #realistically we are only concerned with 'submitted' action of the pull_request_review event, since submit represents the true first time the maintainer reviewed the pr
+				metric_dto["item_number"] = row.payload.get("pull_request", {}).get("number")
 				
+			elif row.trigger_event == "issues" or row.trigger_event == "issue_comment":
+				metric_dto["action"] = row.payload.get("action")
+				metric_dto["item_number"] = row.payload.get("issue", {}).get("number")
+
 
 			per_repo_event_data.setdefault(row.repo_id, []).append(metric_dto)
 
