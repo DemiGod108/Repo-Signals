@@ -4,5 +4,6 @@
   "typeCheckingMode": "standard",
   "extraPaths": [".."],
   "reportAbstractUsage": "none",
-  "reportUnusedExpression": "none"
+  "reportUnusedExpression": "none",
+  "reportOptionalIterable": "none"
 }

@@ -47,18 +47,46 @@ def etl_dag():
 		per_repo_event_data = {}
 		#basically storing all the rows i got from EventData table and attaching them into respective repositories (repo_id basically)
 		for row in interval_event_data:
-			info_dict = {}
+			metric_dto = {
+				"action": None,
+			    "item_number": None, #pr number or issue number
+			    "is_merged": None,
+			    "authors": []
+			}
 
-			info_dict["id"] = row.id
-			info_dict["payload"] = row.payload
-			info_dict["user_id"] = row.user_id
-			info_dict["repo_id"] = row.repo_id
-			info_dict["trigger_event"] = row.trigger_event
+			metric_dto["id"] = row.id
+			metric_dto["user_id"] = row.user_id
+			metric_dto["repo_id"] = row.repo_id
+			metric_dto["trigger_event"] = row.trigger_event
 
 			#the column, event_occured_at is of type datetime and airflow parses the XCOMs into json, but it wont be able to parse datetime object, hence converting it into string first, making it json safe
 			event_occurred_at = row.event_occurred_at.isoformat()
-			info_dict["event_occurred_at"] = event_occurred_at
-			per_repo_event_data.setdefault(row.repo_id, []).append(info_dict)
+			metric_dto["event_occurred_at"] = event_occurred_at
+
+			#adding relevant fields from the payload itself:
+
+			if row.trigger_event == 'push':
+				#as per github webhooks, push event is also triggered when a branch is deleted and when a branch is deleted, the 'commits' key of the payload will be empty, also we must not count deleting a branch towards bus factor
+				if row.payload["commits"]:
+					for commit in row.payload.get("commits"): #list of dictionary (list of commit objects) 
+						name = commit["author"]["name"]
+						metric_dto["authors"].append(name)
+						
+
+			elif row.trigger_event == 'pull_request':
+				metric_dto["action"] = row.payload["action"]
+				metric_dto["item_number"] = row.payload["pull_request"]["number"]
+
+				if row.payload["action"] == 'closed':
+					metric_dto["is_merged"] = row.payload["pull_request"]["merged"]
+ 
+
+			elif row.trigger_event == 'pull_request_review':
+				metric_dto["action"] = row.payload["action"] #realistically we are only concerned with 'submitted' action of the pull_request_review event, since submit represents the true first time the maintainer reviewed the pr
+				metric_dto["item_number"] = row.payload["pull_request"]["number"]
+				
+
+			per_repo_event_data.setdefault(row.repo_id, []).append(metric_dto)
 
 
 		return per_repo_event_data
@@ -70,7 +98,7 @@ def etl_dag():
 		for repo_id, event_list in per_repo_event_data.items():
 			daily_count={} #{date (event occured at): number of events} this event includes all the events that the webhook subscribed to
 			for event in event_list:
-				event_dt = datetime.fromisoformat(event["event_occurred_at"]).date()
+				event_dt = datetime.fromisoformat(event["event_occurred_at"]).date() #need to extract date, so that i can calculate, number of events per day 
 				daily_count[event_dt] = daily_count.get(event_dt, 0) + 1
 
 			sorted_dates = sorted(daily_count.keys())
@@ -81,7 +109,7 @@ def etl_dag():
 			for baseline in rolling_baseline_dates:
 				baseline_tot += daily_count.get(baseline, 0)
 
-			if len(rolling_baseline_dates) == 0:
+			if len(rolling_baseline_dates) == 0:  #for handling divsion by zero cases
 				status = "insufficient_data"
 
 			else:
