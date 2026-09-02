@@ -47,6 +47,7 @@ class TrackedRepo(Base):
 	repo_id: Mapped[int] = mapped_column()
 	repo_name: Mapped[str] = mapped_column()
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
+	tracking_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 	__table_args__ = (
 			UniqueConstraint("user_id", "repo_id", name="unq_user_repo"),
