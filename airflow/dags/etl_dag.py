@@ -4,7 +4,8 @@ from airflow.sdk.bases.hook import BaseHook
 from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
-from backend.models import EventData
+from backend.models import EventData, TrackedRepo
+from seeder.seeder import SessionLocal
 
 
 @dag(
@@ -20,7 +21,7 @@ def etl_dag():
 	#catching all the key value pairs passed by the executor using **kwargs
 	def extract_github_payload(**kwargs):
 		#start_date and end_date both are of the type pendulum.DateTime, i dont have to convert these into any other form for querying db cause pendulum.DateTime is inherting from the class datetime (from the stdlib datetime module) and the EventData table stores data in datetime format
-		start_date = kwargs['data_interval_end'] - timedelta(days=28) #i am not implementing incremental load, hence my window will be 28 days before interval end (this window will shift nightly as interval_end keeps shifting forwards)
+		start_date = kwargs['data_interval_end'] - timedelta(days=29) #i am not implementing incremental load, hence my window will be 28 days before interval end (this window will shift nightly as interval_end keeps shifting forwards) 28 days of data + today's data
 		end_date = kwargs['data_interval_end']
 
 		#reading connection url from env (BaseHook.get() checks env variables first and then airflow's meta db)
@@ -39,13 +40,31 @@ def etl_dag():
 		engine = create_engine(connection_url)
 		sessionLocal = sessionmaker(bind=engine)
 
+		per_repo_data = {} #basically storing all the rows i got from EventData table, start date of repo monitoring and attaching them into respective repositories (repo_id basically)
+
+		#example:
+		# per_repo_data = {
+		#     "repo_123": {
+		#         "user_id": "user_456",
+		#         "tracking_started_at": "2026-08-01",
+		#         "events": [] 
+		#     }
+		# }
+
 		with sessionLocal() as db:
+			all_tracked_repos = db.query(TrackedRepo).all()
+			
+			for tracked_repo in all_tracked_repos:
+				per_repo_data[tracked_repo.repo_id] = {
+					"user_id": tracked_repo.user_id,
+					"tracking_started_at": tracked_repo.tracking_started_at.isoformat(),
+					"events": []
+				}
+
 			interval_event_data = db.query(EventData).filter(EventData.event_occurred_at >= start_date, EventData.event_occurred_at <= end_date).all()
 
 		#since the EventData has payload data of multiple repos, i will need to calculate the metrics for each repo. interval_event_data is basically all the rows from EventData falling in that time and date range, but then i need to calculate those metrics per repo, so doing the following
-
-		per_repo_event_data = {}
-		#basically storing all the rows i got from EventData table and attaching them into respective repositories (repo_id basically)
+		
 		for row in interval_event_data:
 			metric_dto = {
 				"action": None,
@@ -89,45 +108,49 @@ def etl_dag():
 				metric_dto["action"] = row.payload.get("action")
 				metric_dto["item_number"] = row.payload.get("issue", {}).get("number")
 
+ 
+			if row.repo_id in per_repo_data:
+				per_repo_data[row.repo_id]["events"].append(metric_dto)
 
-			per_repo_event_data.setdefault(row.repo_id, []).append(metric_dto)
 
-
-		return per_repo_event_data
+		return per_repo_data
 
 	@task
-	def perform_analytics(per_repo_event_data):
+	def perform_analytics(per_repo_data, **kwargs):
 		health_metric_dto = {}
 
-		for repo_id, event_list in per_repo_event_data.items():
-			daily_count={} #{date (event occured at): number of events} this event includes all the events that the webhook subscribed to
-			for event in event_list:
-				event_dt = datetime.fromisoformat(event["event_occurred_at"]).date() #need to extract date, so that i can calculate, number of events per day 
-				daily_count[event_dt] = daily_count.get(event_dt, 0) + 1
+		today = kwargs["data_interval_end"].date() #first get the date of when the task was executed, 'today' shouldn't be last active day for that repo rather it should be the current dag run date
 
-			sorted_dates = sorted(daily_count.keys())
-			today = sorted_dates[-1]
-			rolling_baseline_dates = sorted_dates[:-1] #everything except the latest day
+		for repo_id, repo_data in per_repo_data.items():
+			todays_activity_count = 0
+			health_metric_dto[repo_id] = {"user_id": repo_data.get("user_id")}
 
-			baseline_tot = 0
-			for baseline in rolling_baseline_dates:
-				baseline_tot += daily_count.get(baseline, 0)
+			tracking_started_at = datetime.fromisoformat(repo_data["tracking_started_at"]).date()
 
-			if len(rolling_baseline_dates) == 0:  #for handling divsion by zero cases
-				status = "insufficient_data"
+			#today and tracking_started_at are both datetime.datetime objects, when we subtract two datetime objects we get datetime.timedelta object, min() doesnt work on datetime.timedelta objects, hence using .days to get an interger value that can be compared with 28
+			monitored_days = min(28, (today - tracking_started_at).days)
+
+			if monitored_days < 14:
+				health_metric_dto[repo_id]["spike_decline_metric"] = 'insufficent data'
 
 			else:
-				baseline_avg = baseline_tot / len(rolling_baseline_dates)
+				baseline_tot = 0
+				for event in repo_data.get("events"):
+					event_dt = datetime.fromisoformat(event["event_occurred_at"]).date() #need to extract date, so that i can calculate, number of events per day
 
-				todays_activity_count = daily_count[today]
-				if todays_activity_count > baseline_avg * 1.5:
-					status = "spike"
-				elif todays_activity_count < baseline_avg * 0.5:
-					status = "decline"
+					if event_dt != today:
+						baseline_tot += 1
+					else:
+						todays_activity_count += 1
+				baseline_avg = baseline_tot / monitored_days
+
+				if todays_activity_count > 1.5*baseline_avg and todays_activity_count >= 3:
+					health_metric_dto[repo_id]["spike_decline_metric"] = 'spike'
+				elif todays_activity_count < 0.5*baseline_avg and baseline_avg >= 1.0:
+					health_metric_dto[repo_id]["spike_decline_metric"] = 'decline'
 				else:
-					status = "normal"
-
-			health_metric_dto.setdefault(repo_id, []).append(status)
+					health_metric_dto[repo_id]["spike_decline_metric"] = 'normal'	
+				
 
 	@task
 	def store_health_metric():
