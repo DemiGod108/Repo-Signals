@@ -105,6 +105,7 @@ def etl_dag():
 			elif row.trigger_event == 'pull_request_review':
 				metric_dto["action"] = row.payload.get("action") #realistically we are only concerned with 'submitted' action of the pull_request_review event, since submit represents the true first time the maintainer reviewed the pr
 				metric_dto["item_number"] = row.payload.get("pull_request", {}).get("number")
+				metric_dto["pr_created_at"] = row.payload.get("pull_request", {}).get("created_at")
 				
 			elif row.trigger_event == "issues" or row.trigger_event == "issue_comment":
 				metric_dto["action"] = row.payload.get("action")
@@ -124,6 +125,8 @@ def etl_dag():
 		today = kwargs["data_interval_end"].date() #first get the date of when the task was executed, 'today' shouldn't be last active day for that repo rather it should be the current dag run date
 
 		for repo_id, repo_data in per_repo_data.items():
+			#metric-1: spike / decline detection
+
 			todays_activity_count = 0
 			health_metric_dto[repo_id] = {"user_id": repo_data.get("user_id")}
 
@@ -155,21 +158,42 @@ def etl_dag():
 
 			#metric-2: pr lifecycle health:
 
-			#if no sufficent prs in 28 days window then, calculated metric, then stop there
+			#for avg_time_to_merge:
 			tot_merged_prs=0
-			time_to_merge = 0
+			time_to_merge = 0 #adds up individual time_to_merge, so that we later find the average
+
+			#for avg_time_to_review:
+			processed_pr = set()
+			time_to_review = 0 
+
 			for event in repo_data.get("events"):
 				if event["trigger_event"] == 'pull_request' and event["action"] == 'closed' and event["is_merged"]:
-					tot_merged_prs += 1
 					delta = datetime.fromisoformat(event["event_occurred_at"]).date() - datetime.fromisoformat(event["pr_created_at"]).date()
+					tot_merged_prs += 1
 					time_to_merge += delta.days
 
-			if tot_merged_prs < 3:
-				health_metric_dto[repo_id]['pr_lifecycle_health'] = {"avg_time_to_merge": "insufficent data"}
+				if event["trigger_event"] == 'pull_request_review' and event["action"] == 'submitted':
+					delta = datetime.fromisoformat(event["event_occurred_at"]).date() - datetime.fromisoformat(event["pr_created_at"]).date()
+					pr_num = event["item_number"]
+
+					#this handles the case of multiple pr review for the same pr, we focus on the first review that this pr received
+					if pr_num not in processed_pr:  
+						time_to_review += delta.days
+						processed_pr.add(pr_num)
+
+			health_metric_dto[repo_id]['pr_lifecycle_health'] = {}
+
+			if tot_merged_prs < 3: #getting a baseline minimum of 3 merged prs 
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = "insufficent data"
 			else:
 				avg_time_to_merge = time_to_merge / tot_merged_prs
-				health_metric_dto[repo_id]['pr_lifecycle_health'] = {"avg_time_to_merge": avg_time_to_merge}
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = avg_time_to_merge
 
+			if len(processed_pr) < 3:
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = "insufficent data"
+			else:
+				avg_time_to_review = time_to_review / len(processed_pr)
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = avg_time_to_review
 
 		return health_metric_dto
 				
