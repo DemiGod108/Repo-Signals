@@ -58,7 +58,7 @@ def etl_dag():
 				per_repo_data[tracked_repo.repo_id] = {
 					"user_id": tracked_repo.user_id,
 					"tracking_started_at": tracked_repo.tracking_started_at.isoformat(),
-					"events": []
+					"events": []  #data about each event, rather than storing raw payload
 				}
 
 			interval_event_data = db.query(EventData).filter(EventData.event_occurred_at >= start_date, EventData.event_occurred_at <= end_date).all()
@@ -69,6 +69,7 @@ def etl_dag():
 			metric_dto = {
 				"action": None,
 			    "item_number": None, #pr number or issue number
+			    "pr_created_at": None,
 			    "is_merged": None,
 			    "authors": []
 			}
@@ -98,6 +99,7 @@ def etl_dag():
 
 				if row.payload.get("action") == 'closed':
 					metric_dto["is_merged"] = row.payload.get("pull_request", {}).get("merged")
+					metric_dto["pr_created_at"] = row.payload.get("pull_request", {}).get("created_at")
  
 
 			elif row.trigger_event == 'pull_request_review':
@@ -149,7 +151,27 @@ def etl_dag():
 				elif todays_activity_count < 0.5*baseline_avg and baseline_avg >= 1.0:
 					health_metric_dto[repo_id]["spike_decline_metric"] = 'decline'
 				else:
-					health_metric_dto[repo_id]["spike_decline_metric"] = 'normal'	
+					health_metric_dto[repo_id]["spike_decline_metric"] = 'normal'
+
+			#metric-2: pr lifecycle health:
+
+			#if no sufficent prs in 28 days window then, calculated metric, then stop there
+			tot_merged_prs=0
+			time_to_merge = 0
+			for event in repo_data.get("events"):
+				if event["trigger_event"] == 'pull_request' and event["action"] == 'closed' and event["is_merged"]:
+					tot_merged_prs += 1
+					delta = datetime.fromisoformat(event["event_occurred_at"]).date() - datetime.fromisoformat(event["pr_created_at"]).date()
+					time_to_merge += delta.days
+
+			if tot_merged_prs < 3:
+				health_metric_dto[repo_id]['pr_lifecycle_health'] = {"avg_time_to_merge": "insufficent data"}
+			else:
+				avg_time_to_merge = time_to_merge / tot_merged_prs
+				health_metric_dto[repo_id]['pr_lifecycle_health'] = {"avg_time_to_merge": avg_time_to_merge}
+
+
+		return health_metric_dto
 				
 
 	@task
