@@ -5,7 +5,6 @@ from sqlalchemy import create_engine, URL
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
 from backend.models import EventData, TrackedRepo
-from seeder.seeder import SessionLocal
 
 
 @dag(
@@ -68,9 +67,10 @@ def etl_dag():
 		for row in interval_event_data:
 			metric_dto = {
 				"action": None,
-			    "item_number": None, #pr number or issue number
+			    "item_number": None, #pr number or issue number (this can also be used to identify the parent issue number of a issue_comment)
 			    "pr_created_at": None,
 			    "is_merged": None,
+			    "issue_created_at": None, 
 			    "authors": []
 			}
 
@@ -110,6 +110,7 @@ def etl_dag():
 			elif row.trigger_event == "issues" or row.trigger_event == "issue_comment":
 				metric_dto["action"] = row.payload.get("action")
 				metric_dto["item_number"] = row.payload.get("issue", {}).get("number")
+				metric_dto["issue_created_at"] = row.payload.get("issue", {}).get("created_at")
 
  
 			if row.repo_id in per_repo_data:
@@ -125,7 +126,7 @@ def etl_dag():
 		today = kwargs["data_interval_end"].date() #first get the date of when the task was executed, 'today' shouldn't be last active day for that repo rather it should be the current dag run date
 
 		for repo_id, repo_data in per_repo_data.items():
-			#metric-1: spike / decline detection
+			#metric-1: Spike / Decline Detection
 
 			todays_activity_count = 0
 			health_metric_dto[repo_id] = {"user_id": repo_data.get("user_id")}
@@ -156,7 +157,7 @@ def etl_dag():
 				else:
 					health_metric_dto[repo_id]["spike_decline_metric"] = 'normal'
 
-			#metric-2: pr lifecycle health:
+			#metric-2: PR Lifecycle Health:
 
 			#for avg_time_to_merge:
 			tot_merged_prs=0
@@ -183,7 +184,7 @@ def etl_dag():
 
 			health_metric_dto[repo_id]['pr_lifecycle_health'] = {}
 
-			if tot_merged_prs < 3: #getting a baseline minimum of 3 merged prs 
+			if tot_merged_prs < 3: #setting a baseline minimum of 3 merged prs 
 				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = "insufficent data"
 			else:
 				avg_time_to_merge = time_to_merge / tot_merged_prs
@@ -214,17 +215,46 @@ def etl_dag():
 			else:
 				health_metric_dto[repo_id]['bus_factor'] = 'insufficent data'
 
+			#metric-4: Stale Issues:
+
+			health_metric_dto[repo_id]['stale_issues'] = {}
+			issue_tracker = {} #i need it to keep track of last activity for each issue, a comment on an issue will change the "last" activity date
+			for event in repo_data.get("events"):
+				if event["trigger_event"] == 'issues':
+					issue_num = event["item_number"]
+					if event['action'] == 'closed':
+						issue_tracker.pop(issue_num, None)
+					else:
+						issue_tracker[issue_num] = event["event_occurred_at"]
+
+				elif event['trigger_event'] == 'issue_comment':
+					parent_issue_num = event["item_number"]
+					issue_tracker[parent_issue_num] = event['event_occurred_at']
+
+			stale_issues = set()
+			for issue, timestamp in issue_tracker.items():
+				date = datetime.fromisoformat(timestamp).date()
+				delta = today - date
+
+				if delta.days > 14:
+					stale_issues.add(issue)
+			if len(issue_tracker) == 0:
+				health_metric_dto[repo_id]['stale_issues'] = 'no active open issues'
+			else:
+				percentage_stale = (len(stale_issues) / len(issue_tracker)) * 100
+				health_metric_dto[repo_id]['stale_issues'] = {'percentage_stale': percentage_stale, 'stale_issues': list(stale_issues)} #python set objects are not JSON serializable, hence i cant transfer using XCOMS so i need to convert it into a list
+
 
 		return health_metric_dto
 				
 
 	@task
-	def store_health_metric():
-		...
+	def store_health_metric(health_metrics):
+		print(health_metrics)
 	
 	extract = extract_github_payload()
 	transform = perform_analytics(extract)
-	load = store_health_metric()
+	load = store_health_metric(transform)
 
 	extract >> transform >> load
 
