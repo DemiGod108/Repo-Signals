@@ -160,7 +160,7 @@ def etl_dag():
 
 			#for avg_time_to_merge:
 			tot_merged_prs=0
-			time_to_merge = 0 #adds up individual time_to_merge, so that we later find the average
+			time_to_merge = 0 #adds up individual time_to_merge, so that we can later find the average
 
 			#for avg_time_to_review:
 			processed_pr = set()
@@ -194,6 +194,26 @@ def etl_dag():
 			else:
 				avg_time_to_review = time_to_review / len(processed_pr)
 				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = avg_time_to_review
+
+			#metric-3: Bus Factor:
+
+			author_freq = {}
+			tot_commits=0
+
+			for event in repo_data.get("events"):
+				if event["trigger_event"] == 'push' and event.get("authors"):
+					for author in event["authors"]:
+						author_freq[author] = author_freq.get(author, 0) + 1
+						tot_commits += 1
+
+			if tot_commits:
+				health_metric_dto[repo_id]['bus_factor'] = []
+				for author, freq in author_freq.items():
+					percentage = (freq / tot_commits)*100
+					health_metric_dto[repo_id]['bus_factor'].append({author: percentage})
+			else:
+				health_metric_dto[repo_id]['bus_factor'] = 'insufficent data'
+
 
 		return health_metric_dto
 				
