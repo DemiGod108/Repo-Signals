@@ -9,7 +9,8 @@ from datetime import datetime
 class Base(DeclarativeBase):
 	#need to this specify what dict[str, Any] maps to in database
 	type_annotation_map = {
-        dict[str, Any]: JSON
+        dict[str, Any]: JSON,
+        Any: JSON
     }
 
 class Users(Base):
@@ -62,3 +63,16 @@ class ActiveRepoItems(Base):
 	repo_id: Mapped[int] = mapped_column()
 	item_num: Mapped[int] = mapped_column()
 	event_type: Mapped[str] = mapped_column()
+
+
+class HealthMetrics(Base):
+	__tablename__ = "health_metrics"
+
+	id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+	repo_id: Mapped[int] = mapped_column(ForeignKey("tracked_repo.repo_id"))
+	user_id: Mapped[int] = mapped_column(ForeignKey("tracked_repo.user_id"))
+	spike_decline_metric: Mapped[str] = mapped_column()
+	pr_lifecycle_health: Mapped[dict[str, Any]] = mapped_column()
+	bus_factor: Mapped[Any] = mapped_column() #bus factor is list of dictionary or a string(no sufficent data), so to cover these cases i need to use Any
+	stale_issue: Mapped[dict[str, Any]] = mapped_column()
+	calculated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
