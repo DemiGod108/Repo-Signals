@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from endpoints import users, webhook_setter, producer, live_feed, display_repos, overview
+from endpoints import users, webhook_setter, producer, live_feed, display_repos, overview, health_metrics
 from contextlib import asynccontextmanager
 from workers.live_feed_consumer import live_feed_consumer
 import asyncio
@@ -23,6 +23,7 @@ app.include_router(producer.router)
 app.include_router(live_feed.router)
 app.include_router(display_repos.router)
 app.include_router(overview.router)
+app.include_router(health_metrics.router)
 
 origins = [
 	"http://localhost:3000",
