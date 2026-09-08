@@ -2,9 +2,11 @@ from airflow.sdk import dag, task
 from airflow.timetables.trigger import CronTriggerTimetable
 from airflow.sdk.bases.hook import BaseHook
 from sqlalchemy import create_engine, URL
-from sqlalchemy.orm import sessionmaker
-from datetime import datetime, timedelta
-from backend.models import EventData, TrackedRepo
+from sqlalchemy.orm import session, sessionmaker
+from datetime import datetime, timedelta, timezone
+
+from sqlalchemy.sql.functions import user
+from backend.models import EventData, TrackedRepo, HealthMetrics
 
 
 @dag(
@@ -250,7 +252,42 @@ def etl_dag():
 
 	@task
 	def store_health_metric(health_metrics):
-		print(health_metrics)
+		connection_obj = BaseHook.get_connection("backend_db")
+
+		con_url_parts={}
+		con_url_parts["username"] = connection_obj.login
+		con_url_parts["password"] = connection_obj.password
+		con_url_parts["host"] = connection_obj.host
+		con_url_parts["port"] = connection_obj.port
+		con_url_parts["database"] = connection_obj.schema
+
+		connection_url = URL.create("postgresql", **con_url_parts)
+
+		engine = create_engine(connection_url)
+		sessionLocal = sessionmaker(bind=engine)
+
+		with sessionLocal() as db:
+			for repo_id, health_metric in health_metrics.items():
+
+				user_id = health_metric["user_id"]
+				spike_decline_metric = health_metric["spike_decline_metric"]
+				pr_lifecycle_health = health_metric["pr_lifecycle_health"]
+				bus_factor = health_metric["bus_factor"]
+				stale_issues = health_metric["stale_issues"]
+
+				db.add(HealthMetrics(
+						repo_id=repo_id,
+						user_id=user_id,
+						spike_decline_metric=spike_decline_metric,
+						pr_lifecycle_health=pr_lifecycle_health,
+						bus_factor=bus_factor,
+						stale_issue=stale_issues,
+						calculated_at=datetime.now(timezone.utc)
+					)
+				)
+
+			db.commit()
+
 	
 	extract = extract_github_payload()
 	transform = perform_analytics(extract)

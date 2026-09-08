@@ -80,6 +80,7 @@ class HealthMetrics(Base):
 	__table_args__ = (
 		ForeignKeyConstraint( #composite foreign key 
 			["repo_id", "user_id"],
-			["tracked_repo.repo_id", "tracked_repo.user_id"]
-		)
+			["tracked_repo.repo_id", "tracked_repo.user_id"],
+			ondelete="CASCADE"
+		),
 	)
