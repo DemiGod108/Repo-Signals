@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, UniqueConstraint, ForeignKeyConstraint
 from datetime import datetime
 from sqlalchemy import DateTime
 from sqlalchemy.types import JSON
@@ -51,7 +51,7 @@ class TrackedRepo(Base):
 	tracking_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 	__table_args__ = (
-			UniqueConstraint("user_id", "repo_id", name="unq_user_repo"),
+			UniqueConstraint("user_id", "repo_id", name="unq_user_repo"), #composite unique constraint
 	)
 
 #need the table for tracking number of open prs and issues
@@ -69,10 +69,17 @@ class HealthMetrics(Base):
 	__tablename__ = "health_metrics"
 
 	id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-	repo_id: Mapped[int] = mapped_column(ForeignKey("tracked_repo.repo_id"))
-	user_id: Mapped[int] = mapped_column(ForeignKey("tracked_repo.user_id"))
+	repo_id: Mapped[int] = mapped_column()
+	user_id: Mapped[int] = mapped_column()
 	spike_decline_metric: Mapped[str] = mapped_column()
 	pr_lifecycle_health: Mapped[dict[str, Any]] = mapped_column()
 	bus_factor: Mapped[Any] = mapped_column() #bus factor is list of dictionary or a string(no sufficent data), so to cover these cases i need to use Any
 	stale_issue: Mapped[dict[str, Any]] = mapped_column()
 	calculated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+
+	__table_args__ = (
+		ForeignKeyConstraint( #composite foreign key 
+			["repo_id", "user_id"],
+			["tracked_repo.repo_id", "tracked_repo.user_id"]
+		)
+	)
