@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Repo Signals</title>
+	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+	<div id="landing-container">
+
+		<header class="landing-header">
+			<span class="landing-wordmark">Repo Signals</span>
+		</header>
+
+		<section class="hero">
+			<div class="hero-content">
+				<h1 class="hero-headline">Know the health of your repository.</h1>
+				<p class="hero-subhead">Track activity, contributor spread, and review speed across every repository you maintain — all from one dashboard.</p>
+				<a href="./login.html" id="get-started-button">Get started with GitHub</a>
+			</div>
+
+			<div class="hero-preview card">
+				<div class="preview-section-label">Live Feed</div>
+				<div class="preview-feed-line">
+					<span class="preview-live-dot"></span>
+					<span>3 commits pushed to main</span>
+				</div>
+				<div class="preview-feed-line">
+					<span class="preview-live-dot"></span>
+					<span>Opened #42: Fix pagination bug</span>
+				</div>
+				<div class="preview-feed-line">
+					<span class="preview-live-dot"></span>
+					<span>Closed #17: Memory leak in worker</span>
+				</div>
+
+				<div class="preview-divider"></div>
+
+				<div class="preview-section-label">Health</div>
+				<div class="preview-metric-row">
+					<span class="text-muted">Bus factor</span>
+					<span class="status-good">3 contributors</span>
+				</div>
+				<div class="preview-metric-row">
+					<span class="text-muted">Stale issues</span>
+					<span class="status-bad">2 of 14 open</span>
+				</div>
+				<div class="preview-metric-row">
+					<span class="text-muted">PR review time</span>
+					<span class="status-good">4.2 hrs avg</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="feature-grid">
+			<div class="feature-card card">
+				<h3>Live Feed</h3>
+				<p class="text-muted">Watch pushes, pull requests, issues, and reviews as they happen, streamed straight from GitHub.</p>
+			</div>
+			<div class="feature-card card">
+				<h3>Health Metrics</h3>
+				<p class="text-muted">Spot activity spikes and declines, slow PR reviews, contributor concentration, and stale issues.</p>
+			</div>
+			<div class="feature-card card">
+				<h3>Overview</h3>
+				<p class="text-muted">Commits, forks, open PRs, and open issues for every tracked repo, at a glance.</p>
+			</div>
+		</section>
+
+		<footer class="landing-footer">
+			<span class="text-muted">Repo Signals</span>
+		</footer>
+
+	</div>
+
+	<script type="module" src="index.js"></script>
+</body>
+</html>

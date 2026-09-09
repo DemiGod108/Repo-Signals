@@ -38,7 +38,7 @@ async def github_auth():
 async def complete_auth(code: str | None = None, error: str | None = None, db: Session = Depends(get_db)):
 	#if user denies to authorize
 	if error:
-		return RedirectResponse(f"{frontend_url}/index.html", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+		return RedirectResponse(f"{frontend_url}/index.html?error={error}", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 	#if they accept to authorize:
 	params={
