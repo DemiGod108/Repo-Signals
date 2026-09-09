@@ -26,10 +26,10 @@ def display_health_metrics(repo_id: int, db: Session = Depends(get_db), user: Us
 	else:
 		#building this dictionary because then i wouldnt need to handle any logic in the frontend. In fe i will just need to use the same keys regardless of whether the dag has completed its first execution or not
 		health_metric = {
-			"spike_decline_metric": "No sufficent data yet",
-			"pr_lifecycle_health":  "No sufficent data yet",
-			"bus_factor": "No sufficent data yet",
-			"stale_issue": "No sufficent data yet"
+			"spike_decline_metric": "insufficient data",
+			"pr_lifecycle_health":  "insufficient data",
+			"bus_factor": "insufficient data",
+			"stale_issue": "insufficient data"
 		}
 
 		return JSONResponse(content=health_metric)

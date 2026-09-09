@@ -1,4 +1,5 @@
 import httpx
+from datetime import datetime, UTC
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from models import Users
@@ -69,7 +70,8 @@ async def setup_webhooks(repo_name: SelectRepo, user: Users = Depends(get_curren
 		db.add(TrackedRepo(
 			repo_id=repository_id,
 			repo_name=repository_name,
-			user_id=user.github_id
+			user_id=user.github_id,
+			tracking_started_at = datetime.now(tz=UTC)
 		))
 		db.commit()
 		return JSONResponse(
@@ -86,7 +88,8 @@ async def setup_webhooks(repo_name: SelectRepo, user: Users = Depends(get_curren
 			db.add(TrackedRepo(
 				repo_id=repository_id,
 				repo_name=repository_name,
-				user_id=user.github_id
+				user_id=user.github_id,
+				tracking_started_at=datetime.now(tz=UTC)
 			))
 			db.commit()
 			return JSONResponse(

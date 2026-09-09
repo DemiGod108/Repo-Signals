@@ -2,10 +2,8 @@ from airflow.sdk import dag, task
 from airflow.timetables.trigger import CronTriggerTimetable
 from airflow.sdk.bases.hook import BaseHook
 from sqlalchemy import create_engine, URL
-from sqlalchemy.orm import session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta, timezone
-
-from sqlalchemy.sql.functions import user
 from backend.models import EventData, TrackedRepo, HealthMetrics
 
 
@@ -62,7 +60,7 @@ def etl_dag():
 					"events": []  #data about each event, rather than storing raw payload
 				}
 
-			interval_event_data = db.query(EventData).filter(EventData.event_occurred_at >= start_date, EventData.event_occurred_at <= end_date).all()
+			interval_event_data = db.query(EventData).filter(EventData.event_occurred_at >= start_date, EventData.event_occurred_at <= end_date).order_by(EventData.event_occurred_at).all() #odering the events from oldest to newest gurantees all metrics work properly, without this we might encounter a merged event for PR 42 before we ever see the opened event. The script will look for PR 42's start time in the tracker, throw a KeyError, and crash your Airflow DAG. 
 
 		#since the EventData has payload data of multiple repos, i will need to calculate the metrics for each repo. interval_event_data is basically all the rows from EventData falling in that time and date range, but then i need to calculate those metrics per repo, so doing the following
 		
@@ -139,7 +137,7 @@ def etl_dag():
 			monitored_days = min(28, (today - tracking_started_at).days)
 
 			if monitored_days < 14:
-				health_metric_dto[repo_id]["spike_decline_metric"] = 'insufficent data'
+				health_metric_dto[repo_id]["spike_decline_metric"] = 'insufficient data'
 
 			else:
 				baseline_tot = 0
@@ -187,13 +185,13 @@ def etl_dag():
 			health_metric_dto[repo_id]['pr_lifecycle_health'] = {}
 
 			if tot_merged_prs < 3: #setting a baseline minimum of 3 merged prs 
-				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = "insufficent data"
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = "insufficient data"
 			else:
 				avg_time_to_merge = time_to_merge / tot_merged_prs
 				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_merge'] = avg_time_to_merge
 
 			if len(processed_pr) < 3:
-				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = "insufficent data"
+				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = "insufficient data"
 			else:
 				avg_time_to_review = time_to_review / len(processed_pr)
 				health_metric_dto[repo_id]['pr_lifecycle_health']['avg_time_to_review'] = avg_time_to_review
@@ -215,23 +213,33 @@ def etl_dag():
 					percentage = (freq / tot_commits)*100
 					health_metric_dto[repo_id]['bus_factor'].append({author: percentage})
 			else:
-				health_metric_dto[repo_id]['bus_factor'] = 'insufficent data'
+				health_metric_dto[repo_id]['bus_factor'] = 'insufficient data'
 
 			#metric-4: Stale Issues:
 
 			health_metric_dto[repo_id]['stale_issues'] = {}
 			issue_tracker = {} #i need it to keep track of last activity for each issue, a comment on an issue will change the "last" activity date
+			closed_issues = set() #i need this to handle case where someone comments to a closed issue, i shouldnt be accounting that event to issue activity 
 			for event in repo_data.get("events"):
 				if event["trigger_event"] == 'issues':
 					issue_num = event["item_number"]
+
 					if event['action'] == 'closed':
 						issue_tracker.pop(issue_num, None)
-					else:
+						closed_issues.add(issue_num)
+
+					elif event["action"] == 'reopened':
+						closed_issues.discard(issue_num)
 						issue_tracker[issue_num] = event["event_occurred_at"]
+
+					else: #for action == opened, edited etc
+						issue_tracker[issue_num] = event["event_occurred_at"]
+
 
 				elif event['trigger_event'] == 'issue_comment':
 					parent_issue_num = event["item_number"]
-					issue_tracker[parent_issue_num] = event['event_occurred_at']
+					if parent_issue_num not in closed_issues:
+						issue_tracker[parent_issue_num] = event['event_occurred_at']
 
 			stale_issues = set()
 			for issue, timestamp in issue_tracker.items():
@@ -241,7 +249,7 @@ def etl_dag():
 				if delta.days > 14:
 					stale_issues.add(issue)
 			if len(issue_tracker) == 0:
-				health_metric_dto[repo_id]['stale_issues'] = 'no active open issues'
+				health_metric_dto[repo_id]['stale_issues'] = 'insufficient data'
 			else:
 				percentage_stale = (len(stale_issues) / len(issue_tracker)) * 100
 				health_metric_dto[repo_id]['stale_issues'] = {'percentage_stale': percentage_stale, 'stale_issues': list(stale_issues)} #python set objects are not JSON serializable, hence i cant transfer using XCOMS so i need to convert it into a list
