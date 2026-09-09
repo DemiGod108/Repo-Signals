@@ -16,5 +16,6 @@ settings = Settings()
 if settings.development:
     backend_url = "http://127.0.0.1:8000"
     backend_ngrok = "https://smudgy-synopses-appraisal.ngrok-free.dev"
+    frontend_url = "http://localhost:3000"
 else:
     backend_url = ""

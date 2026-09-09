@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from database import sessionLocal
 from utils import auth
 from utils import encrypt_decrypt
-from utils.config import backend_url
+from utils.config import backend_url, frontend_url
 from datetime import datetime, UTC, timedelta
 
 
@@ -38,8 +38,7 @@ async def github_auth():
 async def complete_auth(code: str | None = None, error: str | None = None, db: Session = Depends(get_db)):
 	#if user denies to authorize
 	if error:
-		response = Response(content="app not authorized", status_code=status.HTTP_401_UNAUTHORIZED)	
-		return response
+		return RedirectResponse(f"{frontend_url}/index.html", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 
 	#if they accept to authorize:
 	params={
@@ -90,7 +89,7 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 		db.add(models.RefreshToken(user_id=github_id, token_hash=hashed_rf, created_at=datetime.now(tz=UTC), expires_at=datetime.now(tz=UTC)+timedelta(days=20), is_revoked=False))
 		db.commit()
 
-	success_resp = Response(content="user successfully authenticated", status_code=status.HTTP_200_OK)
+	success_resp = RedirectResponse(url=f"{frontend_url}/dashboard.html")
 
 	#once authorized we set the cookies
 	success_resp.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='none')
