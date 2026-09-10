@@ -1,0 +1,315 @@
+/* -------------------------------------------------- */
+/* Login Layout */
+/* -------------------------------------------------- */
+
+#login-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	min-height: 100vh;
+
+	padding-left: 24px;
+	padding-right: 24px;
+}
+
+
+/* -------------------------------------------------- */
+/* Brand */
+/* -------------------------------------------------- */
+
+.login-brand {
+	display: inline-flex;
+	align-items: center;
+
+	gap: 10px;
+
+	margin-bottom: 38px;
+
+	color: var(--color-text-primary);
+
+	text-decoration: none;
+}
+
+
+.login-brand:hover {
+	text-decoration: none;
+}
+
+
+.brand-mark {
+	display: flex;
+
+	width: 30px;
+	height: 30px;
+
+	align-items: center;
+	justify-content: center;
+
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--color-border);
+
+	border-radius: 6px;
+
+	background-color: rgba(255, 255, 255, 0.02);
+}
+
+
+.brand-mark svg {
+	width: 18px;
+	height: 18px;
+
+	fill: none;
+
+	stroke: var(--color-text-primary);
+
+	stroke-width: 1.7;
+
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+
+.login-wordmark {
+	font-family: 'Space Grotesk', Arial, sans-serif;
+
+	font-size: 1.125rem;
+	font-weight: 700;
+
+	line-height: 1.3;
+
+	letter-spacing: -0.025em;
+}
+
+
+/* -------------------------------------------------- */
+/* Login Card */
+/* -------------------------------------------------- */
+
+.login-card {
+	width: 100%;
+	max-width: 400px;
+
+	padding-top: 40px;
+	padding-bottom: 36px;
+
+	padding-left: 32px;
+	padding-right: 32px;
+
+	text-align: center;
+}
+
+
+.login-card h1 {
+	margin-bottom: 11px;
+
+	font-size: 1.5rem;
+	line-height: 1.25;
+}
+
+
+.login-subhead {
+	max-width: 320px;
+
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 28px;
+
+	color: var(--color-text-muted);
+
+	font-size: 0.9375rem;
+	line-height: 1.65;
+}
+
+
+/* -------------------------------------------------- */
+/* GitHub Login Button */
+/* -------------------------------------------------- */
+
+#github-login-button {
+	display: flex;
+
+	align-items: center;
+	justify-content: center;
+
+	gap: 10px;
+
+	width: 100%;
+
+	padding-top: 13px;
+	padding-bottom: 13px;
+	padding-left: 16px;
+	padding-right: 16px;
+
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgba(255, 255, 255, 0.10);
+
+	border-radius: 6px;
+
+	background-color: #f1f3f5;
+
+	color: #101214;
+
+	font-family: 'Inter', Arial, sans-serif;
+	font-size: 0.875rem;
+	font-weight: 700;
+
+	line-height: 1.4;
+
+	text-decoration: none;
+
+	box-shadow:
+		0px 1px 1px rgba(0, 0, 0, 0.18);
+
+	transition-property:
+		background-color,
+		transform;
+
+	transition-duration: 0.18s;
+	transition-timing-function: ease;
+}
+
+
+#github-login-button:hover {
+	background-color: #ffffff;
+
+	transform: translateY(-1px);
+
+	text-decoration: none;
+}
+
+
+#github-login-button:focus-visible {
+	outline-width: 2px;
+	outline-style: solid;
+	outline-color: #87a8dc;
+	outline-offset: 3px;
+}
+
+
+.github-icon {
+	width: 17px;
+	height: 17px;
+
+	flex-shrink: 0;
+
+	fill: currentColor;
+}
+
+
+/* -------------------------------------------------- */
+/* Login Note */
+/* -------------------------------------------------- */
+
+.login-note {
+	margin-top: 19px;
+
+	color: var(--color-text-muted);
+
+	font-size: 0.75rem;
+
+	line-height: 1.5;
+}
+
+
+/* -------------------------------------------------- */
+/* Loading Spinner */
+/* -------------------------------------------------- */
+
+.button-spinner {
+	display: none;
+
+	width: 16px;
+	height: 16px;
+
+	border-width: 2px;
+	border-style: solid;
+
+	border-color: rgba(16, 18, 20, 0.25);
+
+	border-top-color: #101214;
+
+	border-radius: 50%;
+}
+
+
+#github-login-button.is-loading {
+	pointer-events: none;
+
+	opacity: 0.75;
+}
+
+
+#github-login-button.is-loading .github-icon {
+	display: none;
+}
+
+
+#github-login-button.is-loading .button-spinner {
+	display: block;
+
+	animation-name: spin;
+	animation-duration: 0.7s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+
+/* -------------------------------------------------- */
+/* Animation */
+/* -------------------------------------------------- */
+
+@keyframes spin {
+
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+
+}
+
+
+/* -------------------------------------------------- */
+/* Responsive */
+/* -------------------------------------------------- */
+
+@media (max-width: 480px) {
+
+	#login-container {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+
+
+	.login-brand {
+		margin-bottom: 30px;
+	}
+
+
+	.login-card {
+		max-width: 100%;
+
+		padding-top: 32px;
+		padding-bottom: 30px;
+
+		padding-left: 22px;
+		padding-right: 22px;
+	}
+
+
+	.login-card h1 {
+		font-size: 1.375rem;
+	}
+
+
+	.login-subhead {
+		font-size: 0.875rem;
+	}
+
+}

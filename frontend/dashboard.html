@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Dashboard — Repo Signals</title>
+
+	<link rel="stylesheet" href="./common.css">
+	<link rel="stylesheet" href="./navbar.css">
+	<link rel="stylesheet" href="./dashboard.css">
+</head>
+
+<body>
+
+	<main id="dashboard-container" class="container">
+
+		<header class="dashboard-header">
+
+			<div class="dashboard-heading">
+				<p class="dashboard-eyebrow">REPOSITORIES</p>
+
+				<h1>Tracked repositories</h1>
+
+				<p class="dashboard-subhead">
+					Monitor repository activity and health metrics from one place.
+				</p>
+			</div>
+
+			<button
+				type="button"
+				id="add-repository-button"
+			>
+				<span aria-hidden="true">+</span>
+				<span>Add repository</span>
+			</button>
+
+		</header>
+
+
+		<section
+			id="repositories-section"
+			aria-labelledby="repositories-heading"
+		>
+
+			<div class="section-heading">
+				<div>
+					<h2 id="repositories-heading">Your repositories</h2>
+
+					<p id="repository-count" class="text-muted">
+						Loading repositories...
+					</p>
+				</div>
+			</div>
+
+
+			<div
+				id="repository-list"
+				class="repository-list"
+			>
+				<div
+					id="repository-loading"
+					class="repository-state"
+					role="status"
+					aria-live="polite"
+				>
+					<p>Loading tracked repositories...</p>
+				</div>
+			</div>
+
+		</section>
+
+	</main>
+
+
+	<!-- Add Repository Modal -->
+	<div
+		id="add-repository-modal"
+		class="modal-overlay"
+		hidden
+	>
+
+		<section
+			class="modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="add-repository-title"
+			aria-describedby="add-repository-description"
+		>
+
+			<div class="modal-header">
+
+				<div>
+					<p class="modal-eyebrow">REPOSITORY SETUP</p>
+
+					<h2 id="add-repository-title">
+						Add repository
+					</h2>
+				</div>
+
+				<button
+					type="button"
+					id="close-modal-button"
+					class="modal-close-button"
+					aria-label="Close add repository dialog"
+				>
+					&times;
+				</button>
+
+			</div>
+
+
+			<div class="modal-body">
+
+				<p
+					id="add-repository-description"
+					class="modal-description"
+				>
+					Add a repository from your GitHub account to start tracking its signals.
+				</p>
+
+
+				<form id="add-repository-form">
+
+					<div class="form-field">
+
+						<label for="repository-name">
+							Repository name
+						</label>
+
+						<input
+							type="text"
+							id="repository-name"
+							name="repository-name"
+							placeholder="my-project"
+							autocomplete="off"
+							required
+						>
+
+						<p class="form-help">
+							Enter the repository name exactly as it appears in your GitHub account.
+						</p>
+
+					</div>
+
+
+					<div
+						id="add-repository-message"
+						class="form-message"
+						role="alert"
+						aria-live="polite"
+					></div>
+
+
+					<div class="modal-actions">
+
+						<button
+							type="button"
+							id="cancel-add-repository-button"
+							class="secondary-button"
+						>
+							Cancel
+						</button>
+
+						<button
+							type="submit"
+							id="submit-add-repository-button"
+						>
+							Add repository
+						</button>
+
+					</div>
+
+				</form>
+
+			</div>
+
+		</section>
+
+	</div>
+
+
+	<script type="module" src="./navbar.js"></script>
+	<script type="module" src="./dashboard.js"></script>
+
+</body>
+</html>

@@ -1,17 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 
 :root {
 	--color-bg: #121212;
 	--color-surface: #1c1c1c;
 	--color-border: #2c2c2c;
+
 	--color-text-primary: #e8e8e8;
-	--color-text-muted: #9a9a9a;
+	--color-text-secondary: #b0b0b0;
+	--color-text-muted: #8f8f8f;
+
 	--color-accent: #4f8ff7;
 	--color-accent-hover: #3d7ce0;
+
 	--color-success: #3fb950;
 	--color-warning: #e5534b;
+
+
+	/* -------------------------------------------------- */
+	/* Typography Scale */
+	/* -------------------------------------------------- */
+
+	--font-size-xs: 0.75rem;       /* 12px */
+	--font-size-sm: 0.8125rem;     /* 13px */
+	--font-size-md: 0.875rem;      /* 14px */
+	--font-size-base: 1rem;        /* 16px */
+	--font-size-lg: 1.125rem;      /* 18px */
+	--font-size-xl: 1.25rem;       /* 20px */
+	--font-size-2xl: 1.5rem;       /* 24px */
+	--font-size-3xl: 1.875rem;     /* 30px */
+
+
+	/* -------------------------------------------------- */
+	/* Line Heights */
+	/* -------------------------------------------------- */
+
+	--line-height-tight: 1.25;
+	--line-height-normal: 1.5;
+	--line-height-relaxed: 1.65;
 }
+
+
+/* -------------------------------------------------- */
+/* Reset */
+/* -------------------------------------------------- */
 
 * {
 	box-sizing: border-box;
@@ -19,55 +51,94 @@
 	padding: 0;
 }
 
+
 html {
 	font-size: 16px;
 }
 
+
 body {
 	background-color: var(--color-bg);
 	color: var(--color-text-primary);
+
 	font-family: 'Inter', Arial, sans-serif;
-	font-size: 1rem;
-	line-height: 1.5;
+	font-size: var(--font-size-base);
+	line-height: var(--line-height-normal);
+
 	min-height: 100vh;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
+
+
+/* -------------------------------------------------- */
+/* Typography */
+/* -------------------------------------------------- */
 
 h1 {
-	font-size: 2rem;
-	font-weight: 700;
-	font-family: 'Space Grotesk', Arial, sans-serif;
-	color: var(--color-text-primary);
 	margin-bottom: 16px;
+
+	color: var(--color-text-primary);
+
+	font-family: 'Space Grotesk', Arial, sans-serif;
+	font-size: var(--font-size-3xl);
+	font-weight: 700;
+	line-height: var(--line-height-tight);
+	letter-spacing: -0.025em;
 }
+
 
 h2 {
-	font-size: 1.5rem;
-	font-weight: 700;
-	font-family: 'Space Grotesk', Arial, sans-serif;
-	color: var(--color-text-primary);
 	margin-bottom: 12px;
+
+	color: var(--color-text-primary);
+
+	font-family: 'Space Grotesk', Arial, sans-serif;
+	font-size: var(--font-size-2xl);
+	font-weight: 700;
+	line-height: var(--line-height-tight);
+	letter-spacing: -0.02em;
 }
 
+
 h3 {
-	font-size: 1.125rem;
-	font-weight: 600;
-	font-family: 'Space Grotesk', Arial, sans-serif;
-	color: var(--color-text-primary);
 	margin-bottom: 8px;
+
+	color: var(--color-text-primary);
+
+	font-family: 'Space Grotesk', Arial, sans-serif;
+	font-size: var(--font-size-lg);
+	font-weight: 600;
+	line-height: 1.35;
+	letter-spacing: -0.01em;
 }
+
 
 p {
 	color: var(--color-text-primary);
 }
+
+
+.text-muted {
+	color: var(--color-text-muted);
+}
+
+
+/* -------------------------------------------------- */
+/* Links */
+/* -------------------------------------------------- */
 
 a {
 	color: var(--color-accent);
 	text-decoration: none;
 }
 
+
 a:hover {
 	text-decoration: underline;
 }
+
 
 a:focus-visible {
 	outline-width: 2px;
@@ -76,29 +147,46 @@ a:focus-visible {
 	outline-offset: 2px;
 }
 
+
+/* -------------------------------------------------- */
+/* Buttons */
+/* -------------------------------------------------- */
+
 button {
 	background-color: var(--color-accent);
-	color: var(--color-bg);
+	color: #101214;
+
 	font-family: 'Inter', Arial, sans-serif;
-	font-size: 1rem;
+	font-size: var(--font-size-md);
 	font-weight: 600;
-	border-width: 0px;
+	line-height: 1.4;
+
+	border-width: 0;
 	border-style: none;
 	border-radius: 4px;
+
 	padding-top: 10px;
 	padding-bottom: 10px;
-	padding-left: 18px;
-	padding-right: 18px;
+	padding-left: 16px;
+	padding-right: 16px;
+
 	cursor: pointer;
-	transition-property: transform, background-color;
+
+	transition-property:
+		transform,
+		background-color;
+
 	transition-duration: 0.15s;
 	transition-timing-function: ease-out;
 }
 
+
 button:hover {
 	background-color: var(--color-accent-hover);
-	transform: translateY(-2px);
+
+	transform: translateY(-1px);
 }
+
 
 button:focus-visible {
 	outline-width: 2px;
@@ -107,50 +195,73 @@ button:focus-visible {
 	outline-offset: 2px;
 }
 
+
 button:disabled {
 	background-color: var(--color-border);
 	color: var(--color-text-muted);
+
 	cursor: not-allowed;
 }
 
+
+/* -------------------------------------------------- */
+/* Shared Layout */
+/* -------------------------------------------------- */
+
 .container {
 	max-width: 1100px;
+
 	margin-left: auto;
 	margin-right: auto;
+
 	padding-left: 24px;
 	padding-right: 24px;
 	padding-top: 32px;
 	padding-bottom: 32px;
 }
 
+
 .card {
 	background-color: var(--color-surface);
+
 	border-width: 1px;
 	border-style: solid;
 	border-color: var(--color-border);
 	border-radius: 6px;
+
 	padding-top: 20px;
 	padding-bottom: 20px;
 	padding-left: 20px;
 	padding-right: 20px;
-	transition-property: transform, box-shadow, border-color;
+
+	transition-property:
+		transform,
+		box-shadow,
+		border-color;
+
 	transition-duration: 0.2s;
 	transition-timing-function: ease-out;
 }
 
+
 .card:hover {
-	transform: translateY(-4px);
+	transform: translateY(-2px);
+
 	border-color: var(--color-accent);
-	box-shadow: 0px 8px 24px rgba(79, 143, 247, 0.15);
+
+	box-shadow:
+		0px 8px 24px rgba(79, 143, 247, 0.15);
 }
 
-.text-muted {
-	color: var(--color-text-muted);
-}
+
+/* -------------------------------------------------- */
+/* Status */
+/* -------------------------------------------------- */
 
 .status-good {
 	color: var(--color-success);
 }
+
 
 .status-bad {
 	color: var(--color-warning);
