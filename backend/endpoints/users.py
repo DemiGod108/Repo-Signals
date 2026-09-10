@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from database import sessionLocal
 from utils import auth
 from utils import encrypt_decrypt
-from utils.config import backend_url, frontend_url
+from utils.config import backend_url, frontend_url, cookies_settings
 from datetime import datetime, UTC, timedelta
 
 
@@ -92,8 +92,8 @@ async def complete_auth(code: str | None = None, error: str | None = None, db: S
 	success_resp = RedirectResponse(url=f"{frontend_url}/dashboard.html")
 
 	#once authorized we set the cookies
-	success_resp.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='none')
-	success_resp.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite='none')
+	success_resp.set_cookie(key="access_token", value=access_token, httponly=cookies_settings["httponly"], secure=cookies_settings["secure"], samesite=cookies_settings["samesite"])
+	success_resp.set_cookie(key="refresh_token", value=refresh_token, httponly=cookies_settings["httponly"], secure=cookies_settings["secure"], samesite=cookies_settings["samesite"])
 
 	return success_resp
 
@@ -108,10 +108,10 @@ def refresh_access_token(request: Request, db: Session=Depends(get_db)):
 	if refresh_token_obj:
 		if not refresh_token_obj.is_revoked and refresh_token_obj.expires_at > datetime.now(tz=UTC):
 			github_id = refresh_token_obj.user_id
-			new_access_token = auth.create_access_token({"sub": github_id})
+			new_access_token = auth.create_access_token({"sub": str(github_id)})
 
 			response = Response(status_code=status.HTTP_200_OK, content="success")
-			response.set_cookie(key="access_token", value=new_access_token, httponly=True, secure=True, samesite='lax')
+			response.set_cookie(key="access_token", value=new_access_token, httponly=cookies_settings["httponly"], secure=cookies_settings["secure"], samesite=cookies_settings["samesite"])
 			return response
 		else:
 			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="please login again")
