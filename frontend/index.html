@@ -1,81 +1,1033 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1.0"
+	>
+
 	<title>Repo Signals</title>
-	<link rel="stylesheet" href="common.css">
-	<link rel="stylesheet" href="index.css">
+
+	<link
+		rel="stylesheet"
+		href="common.css"
+	>
+
+	<link
+		rel="stylesheet"
+		href="index.css"
+	>
+
 </head>
+
+
 <body>
 
 	<div id="landing-container">
 
+
+		<!-- =====================================================
+		     HEADER
+		     ===================================================== -->
+
 		<header class="landing-header">
-			<span class="landing-wordmark">Repo Signals</span>
+
+			<a
+				class="landing-brand"
+				href="./index.html"
+				aria-label="Repo Signals home"
+			>
+
+				<span
+					class="brand-mark"
+					aria-hidden="true"
+				>
+
+					<svg viewBox="0 0 32 32">
+
+						<path d="M6 22L13 15L18 19L26 10"></path>
+
+						<circle
+							cx="6"
+							cy="22"
+							r="2"
+						></circle>
+
+						<circle
+							cx="13"
+							cy="15"
+							r="2"
+						></circle>
+
+						<circle
+							cx="18"
+							cy="19"
+							r="2"
+						></circle>
+
+						<circle
+							cx="26"
+							cy="10"
+							r="2"
+						></circle>
+
+					</svg>
+
+				</span>
+
+				<span class="landing-wordmark">
+					Repo Signals
+				</span>
+
+			</a>
+
 		</header>
 
-		<section class="hero">
-			<div class="hero-content">
-				<h1 class="hero-headline">Know the health of your repository.</h1>
-				<p class="hero-subhead">Track activity, contributor spread, and review speed across every repository you maintain — all from one dashboard.</p>
-				<a href="./login.html" id="get-started-button">Get started with GitHub</a>
-			</div>
 
-			<div class="hero-preview card">
-				<div class="preview-section-label">Live Feed</div>
-				<div class="preview-feed-line">
-					<span class="preview-live-dot"></span>
-					<span>3 commits pushed to main</span>
-				</div>
-				<div class="preview-feed-line">
-					<span class="preview-live-dot"></span>
-					<span>Opened #42: Fix pagination bug</span>
-				</div>
-				<div class="preview-feed-line">
-					<span class="preview-live-dot"></span>
-					<span>Closed #17: Memory leak in worker</span>
+
+		<main>
+
+
+			<!-- =====================================================
+			     HERO
+			     ===================================================== -->
+
+			<section class="hero">
+
+
+				<div class="hero-content">
+
+
+					<div class="hero-eyebrow">
+
+						<span class="eyebrow-line"></span>
+
+						GITHUB REPOSITORY OBSERVABILITY
+
+					</div>
+
+
+					<h1 class="hero-headline">
+
+						Understand what is
+						happening in your
+
+						<span>
+							repositories.
+						</span>
+
+					</h1>
+
+
+					<p class="hero-subhead">
+
+						Repo Signals turns GitHub activity into a clear view
+						of repository health, contributor ownership,
+						pull-request performance, and emerging issues.
+
+					</p>
+
+
+					<div class="hero-actions">
+
+						<a
+							href="./login.html"
+							id="get-started-button"
+						>
+
+							<span>
+								Connect GitHub
+							</span>
+
+							<svg
+								class="button-arrow"
+								viewBox="0 0 20 20"
+								aria-hidden="true"
+							>
+
+								<path d="M4 10H15"></path>
+
+								<path d="M11 6L15 10L11 14"></path>
+
+							</svg>
+
+						</a>
+
+
+						<span class="hero-note">
+							Read-only access to your GitHub data
+						</span>
+
+					</div>
+
+
+					<div class="hero-meta">
+
+						<span>
+							Repository activity
+						</span>
+
+						<span class="meta-divider"></span>
+
+						<span>
+							PR performance
+						</span>
+
+						<span class="meta-divider"></span>
+
+						<span>
+							Contributor health
+						</span>
+
+					</div>
+
+
 				</div>
 
-				<div class="preview-divider"></div>
 
-				<div class="preview-section-label">Health</div>
-				<div class="preview-metric-row">
-					<span class="text-muted">Bus factor</span>
-					<span class="status-good">3 contributors</span>
-				</div>
-				<div class="preview-metric-row">
-					<span class="text-muted">Stale issues</span>
-					<span class="status-bad">2 of 14 open</span>
-				</div>
-				<div class="preview-metric-row">
-					<span class="text-muted">PR review time</span>
-					<span class="status-good">4.2 hrs avg</span>
-				</div>
-			</div>
-		</section>
 
-		<section class="feature-grid">
-			<div class="feature-card card">
-				<h3>Live Feed</h3>
-				<p class="text-muted">Watch pushes, pull requests, issues, and reviews as they happen, streamed straight from GitHub.</p>
-			</div>
-			<div class="feature-card card">
-				<h3>Health Metrics</h3>
-				<p class="text-muted">Spot activity spikes and declines, slow PR reviews, contributor concentration, and stale issues.</p>
-			</div>
-			<div class="feature-card card">
-				<h3>Overview</h3>
-				<p class="text-muted">Commits, forks, open PRs, and open issues for every tracked repo, at a glance.</p>
-			</div>
-		</section>
+				<!-- =================================================
+				     PRODUCT PREVIEW
+				     ================================================= -->
+
+				<div class="hero-preview-wrap">
+
+
+					<div class="preview-label">
+						LIVE REPOSITORY VIEW
+					</div>
+
+
+					<div class="hero-preview card">
+
+
+						<!-- Repository header -->
+
+						<div class="preview-topbar">
+
+							<div class="preview-repo">
+
+								<span class="repo-status-dot"></span>
+
+								<div>
+
+									<span class="preview-repo-name">
+										acme / api-server
+									</span>
+
+									<span class="preview-branch">
+										main
+									</span>
+
+								</div>
+
+							</div>
+
+
+							<span class="preview-live-label">
+
+								<span class="preview-live-dot"></span>
+
+								LIVE
+
+							</span>
+
+						</div>
+
+
+
+						<!-- Repository activity -->
+
+						<div class="preview-chart">
+
+							<div class="preview-chart-header">
+
+								<div>
+
+									<span class="chart-title">
+										Repository activity
+									</span>
+
+									<span class="chart-subtitle">
+										Last 24 hours
+									</span>
+
+								</div>
+
+
+								<span class="chart-alert">
+
+									<span class="chart-alert-dot"></span>
+
+									Spike detected
+
+								</span>
+
+							</div>
+
+
+							<div class="activity-chart">
+
+								<div class="chart-grid-line"></div>
+								<div class="chart-grid-line"></div>
+								<div class="chart-grid-line"></div>
+
+
+								<svg
+									viewBox="0 0 500 120"
+									preserveAspectRatio="none"
+									aria-hidden="true"
+								>
+
+									<defs>
+
+										<linearGradient
+											id="activity-fill"
+											x1="0"
+											y1="0"
+											x2="0"
+											y2="1"
+										>
+
+											<stop
+												offset="0%"
+												stop-opacity="0.12"
+											></stop>
+
+											<stop
+												offset="100%"
+												stop-opacity="0"
+											></stop>
+
+										</linearGradient>
+
+									</defs>
+
+
+									<path
+										class="chart-area"
+										d="M0,105 L28,98 L55,100 L82,80 L110,88 L137,62 L165,70 L192,58 L220,68 L247,42 L275,52 L302,29 L330,43 L357,25 L385,37 L412,18 L440,32 L468,12 L500,20 L500,120 L0,120 Z"
+									></path>
+
+
+									<path
+										class="chart-line"
+										d="M0,105 L28,98 L55,100 L82,80 L110,88 L137,62 L165,70 L192,58 L220,68 L247,42 L275,52 L302,29 L330,43 L357,25 L385,37 L412,18 L440,32 L468,12 L500,20"
+									></path>
+
+
+									<circle
+										class="chart-endpoint"
+										cx="500"
+										cy="20"
+										r="4"
+									></circle>
+
+								</svg>
+
+							</div>
+
+						</div>
+
+
+
+						<!-- PR lifecycle -->
+
+						<div class="preview-section">
+
+							<div class="preview-section-header">
+
+								<span>
+									PR lifecycle health
+								</span>
+
+								<span class="section-status status-good">
+									Healthy
+								</span>
+
+							</div>
+
+
+							<div class="lifecycle-grid">
+
+
+								<div class="lifecycle-item">
+
+									<div class="metric-icon blue-icon">
+
+										<svg viewBox="0 0 24 24">
+
+											<path d="M5 12H19"></path>
+
+											<path
+												d="M12 5L19 12L12 19"
+											></path>
+
+										</svg>
+
+									</div>
+
+
+									<div class="metric-copy">
+
+										<span>
+											PR merge time
+										</span>
+
+										<strong>
+											2 days avg
+										</strong>
+
+									</div>
+
+								</div>
+
+
+								<div class="lifecycle-item">
+
+									<div class="metric-icon green-icon">
+
+										<svg viewBox="0 0 24 24">
+
+											<path d="M5 12L10 17L19 7"></path>
+
+										</svg>
+
+									</div>
+
+
+									<div class="metric-copy">
+
+										<span>
+											PR review time
+										</span>
+
+										<strong>
+											2.5 days avg
+										</strong>
+
+									</div>
+
+								</div>
+
+
+							</div>
+
+						</div>
+
+
+
+						<!-- Bus factor -->
+
+						<div class="preview-section">
+
+							<div class="preview-section-header">
+
+								<span>
+									Bus factor
+								</span>
+
+								<span class="section-status">
+									3 contributors
+								</span>
+
+							</div>
+
+
+							<div class="ownership-list">
+
+
+								<div class="ownership-row">
+
+									<div class="ownership-person">
+
+										<span class="person-dot dot-blue"></span>
+
+										<span>
+											John Doe
+										</span>
+
+									</div>
+
+									<span class="ownership-value">
+										30%
+									</span>
+
+								</div>
+
+
+								<div class="ownership-row">
+
+									<div class="ownership-person">
+
+										<span class="person-dot dot-green"></span>
+
+										<span>
+											Jane Doe
+										</span>
+
+									</div>
+
+									<span class="ownership-value">
+										39%
+									</span>
+
+								</div>
+
+
+								<div class="ownership-row">
+
+									<div class="ownership-person">
+
+										<span class="person-dot dot-purple"></span>
+
+										<span>
+											Alex Doe
+										</span>
+
+									</div>
+
+									<span class="ownership-value">
+										31%
+									</span>
+
+								</div>
+
+
+							</div>
+
+						</div>
+
+
+
+						<!-- Stale issues -->
+
+						<div class="preview-section stale-section">
+
+							<div class="preview-section-header">
+
+								<span>
+									Stale issues
+								</span>
+
+								<span class="section-status status-warning">
+									Needs review
+								</span>
+
+							</div>
+
+
+							<div class="stale-issue-row">
+
+								<div class="metric-icon red-icon">
+
+									<svg viewBox="0 0 24 24">
+
+										<path d="M12 7V13"></path>
+
+										<circle
+											cx="12"
+											cy="17"
+											r="1"
+										></circle>
+
+									</svg>
+
+								</div>
+
+
+								<div class="metric-copy">
+
+									<span>
+										Open issues becoming stale
+									</span>
+
+									<strong>
+										2 of 14 open
+									</strong>
+
+								</div>
+
+							</div>
+
+						</div>
+
+
+
+						<!-- Latest signals -->
+
+						<div class="preview-feed">
+
+							<div class="preview-feed-header">
+
+								<span>
+									Latest signals
+								</span>
+
+								<span>
+									Just now
+								</span>
+
+							</div>
+
+
+							<div class="preview-feed-line">
+
+								<span
+									class="preview-signal-dot signal-blue"
+								></span>
+
+								<span class="feed-message">
+
+									3 commits pushed to
+									<strong>main</strong>
+
+								</span>
+
+								<span class="feed-time">
+									12s
+								</span>
+
+							</div>
+
+
+							<div class="preview-feed-line">
+
+								<span
+									class="preview-signal-dot signal-green"
+								></span>
+
+								<span class="feed-message">
+
+									Opened
+									<strong>#42</strong>:
+									Fix pagination bug
+
+								</span>
+
+								<span class="feed-time">
+									48s
+								</span>
+
+							</div>
+
+
+							<div class="preview-feed-line">
+
+								<span
+									class="preview-signal-dot signal-red"
+								></span>
+
+								<span class="feed-message">
+
+									Closed
+									<strong>#17</strong>:
+									Memory leak
+
+								</span>
+
+								<span class="feed-time">
+									2m
+								</span>
+
+							</div>
+
+						</div>
+
+
+					</div>
+
+
+				</div>
+
+			</section>
+
+
+
+			<!-- =====================================================
+			     PRODUCT FEATURES
+			     ===================================================== -->
+
+			<section class="feature-section">
+
+
+				<div class="section-intro">
+
+					<div>
+
+						<span class="section-eyebrow">
+							WHAT YOU SEE
+						</span>
+
+						<h2>
+							Signals that help you
+							<span>act earlier.</span>
+						</h2>
+
+					</div>
+
+
+					<p>
+
+						No dashboards packed with metrics you never use.
+						Just the signals that matter when maintaining
+						a repository.
+
+					</p>
+
+				</div>
+
+
+
+				<div class="feature-list">
+
+
+					<!-- Feature 01 -->
+
+					<article class="feature-row">
+
+						<div class="feature-number">
+							01
+						</div>
+
+
+						<div class="feature-title">
+
+							<div class="feature-icon feature-blue">
+
+								<svg viewBox="0 0 24 24">
+
+									<path d="M5 18V10"></path>
+									<path d="M12 18V5"></path>
+									<path d="M19 18V8"></path>
+
+								</svg>
+
+							</div>
+
+							<h3>
+								Live activity
+							</h3>
+
+						</div>
+
+
+						<p class="feature-description">
+
+							Follow pushes, pull requests, issues, and reviews
+							as they happen, without switching between GitHub
+							pages.
+
+						</p>
+
+
+						<div class="feature-demo activity-demo">
+
+							<div class="demo-line">
+								<span class="demo-dot blue-demo-dot"></span>
+								<span>push to main</span>
+								<small>12s</small>
+							</div>
+
+							<div class="demo-line">
+								<span class="demo-dot green-demo-dot"></span>
+								<span>PR #42 opened</span>
+								<small>48s</small>
+							</div>
+
+							<div class="demo-line">
+								<span class="demo-dot gray-demo-dot"></span>
+								<span>issue #17 closed</span>
+								<small>2m</small>
+							</div>
+
+						</div>
+
+					</article>
+
+
+
+					<!-- Feature 02 -->
+
+					<article class="feature-row">
+
+						<div class="feature-number">
+							02
+						</div>
+
+
+						<div class="feature-title">
+
+							<div class="feature-icon feature-green">
+
+								<svg viewBox="0 0 24 24">
+
+									<path
+										d="M4 18L9 13L13 16L20 7"
+									></path>
+
+								</svg>
+
+							</div>
+
+							<h3>
+								Repository health
+							</h3>
+
+						</div>
+
+
+						<p class="feature-description">
+
+							Spot unusual activity, stale work, slow reviews,
+							and uneven contributor ownership before they
+							become expensive problems.
+
+						</p>
+
+
+						<div class="feature-demo health-demo">
+
+							<div class="health-demo-header">
+
+								<span>
+									Activity
+								</span>
+
+								<span class="health-demo-alert">
+									Spike detected
+								</span>
+
+							</div>
+
+
+							<div class="health-bars">
+
+								<span style="height: 28%"></span>
+								<span style="height: 42%"></span>
+								<span style="height: 35%"></span>
+								<span style="height: 54%"></span>
+								<span style="height: 48%"></span>
+								<span style="height: 72%"></span>
+								<span style="height: 91%"></span>
+
+							</div>
+
+						</div>
+
+					</article>
+
+
+
+					<!-- Feature 03 -->
+
+					<article class="feature-row">
+
+						<div class="feature-number">
+							03
+						</div>
+
+
+						<div class="feature-title">
+
+							<div class="feature-icon feature-purple">
+
+								<svg viewBox="0 0 24 24">
+
+									<rect
+										x="4"
+										y="4"
+										width="6"
+										height="6"
+									></rect>
+
+									<rect
+										x="14"
+										y="4"
+										width="6"
+										height="6"
+									></rect>
+
+									<rect
+										x="4"
+										y="14"
+										width="6"
+										height="6"
+									></rect>
+
+									<rect
+										x="14"
+										y="14"
+										width="6"
+										height="6"
+									></rect>
+
+								</svg>
+
+							</div>
+
+							<h3>
+								Engineering signals
+							</h3>
+
+						</div>
+
+
+						<p class="feature-description">
+
+							See PR lifecycle performance, contributor
+							concentration, and repository-level health
+							in one place.
+
+						</p>
+
+
+						<div class="feature-demo signal-demo">
+
+							<div class="signal-demo-row">
+
+								<span>
+									PR merge time
+								</span>
+
+								<strong>
+									2 days
+								</strong>
+
+							</div>
+
+
+							<div class="signal-demo-row">
+
+								<span>
+									PR review time
+								</span>
+
+								<strong>
+									2.5 days
+								</strong>
+
+							</div>
+
+
+							<div class="signal-demo-row">
+
+								<span>
+									Bus factor
+								</span>
+
+								<strong>
+									3 contributors
+								</strong>
+
+							</div>
+
+						</div>
+
+					</article>
+
+
+				</div>
+
+			</section>
+
+
+
+			<!-- =====================================================
+			     BOTTOM CTA
+			     ===================================================== -->
+
+			<section class="bottom-cta">
+
+				<div class="bottom-cta-copy">
+
+					<span class="section-eyebrow">
+						GET STARTED
+					</span>
+
+
+					<h2>
+
+						Your repository already
+						<span>
+							has the signals.
+						</span>
+
+					</h2>
+
+
+					<p>
+
+						Connect GitHub and turn them into something
+						you can actually use.
+
+					</p>
+
+				</div>
+
+
+				<a
+					href="./login.html"
+					class="secondary-cta"
+				>
+
+					Connect GitHub
+
+					<svg
+						viewBox="0 0 20 20"
+						aria-hidden="true"
+					>
+
+						<path d="M4 10H15"></path>
+
+						<path d="M11 6L15 10L11 14"></path>
+
+					</svg>
+
+				</a>
+
+			</section>
+
+		</main>
+
+
 
 		<footer class="landing-footer">
-			<span class="text-muted">Repo Signals</span>
+
+			<span>
+				Repo Signals
+			</span>
+
+
+			<div class="footer-right">
+
+				<span>
+					GitHub repository observability
+				</span>
+
+				<span class="footer-divider"></span>
+
+				<span>
+					Built for developers
+				</span>
+
+			</div>
+
 		</footer>
+
 
 	</div>
 
-	<script type="module" src="index.js"></script>
+
+	<script
+		type="module"
+		src="index.js"
+	></script>
+
 </body>
+
 </html>
