@@ -64,13 +64,16 @@ async def setup_webhooks(repo_name: SelectRepo, user: Users = Depends(get_curren
 	#setting up webhooks
 	async with httpx.AsyncClient() as client:
 		webhook = await client.post(f"https://api.github.com/repos/{user.github_username}/{repo_name.repo_name}/hooks", headers=headers, json=data)
+	data = webhook.json()
 
 	#happy path, webhook gets setup and we need to insert the repo details and current user's github id into db
 	if webhook.status_code == httpx.codes.CREATED:
+		hook_id = data.get("id")
 		db.add(TrackedRepo(
 			repo_id=repository_id,
 			repo_name=repository_name,
 			user_id=user.github_id,
+			hook_id = hook_id,
 			tracking_started_at = datetime.now(tz=UTC)
 		))
 		db.commit()
@@ -83,19 +86,40 @@ async def setup_webhooks(repo_name: SelectRepo, user: Users = Depends(get_curren
 	elif webhook.status_code == httpx.codes.UNPROCESSABLE_ENTITY:
 		error_body = webhook.json()
 		error_msg = error_body.get("errors")[0].get("message")
-		
+
 		if error_msg == "Hook already exists on this repository":
-			db.add(TrackedRepo(
-				repo_id=repository_id,
-				repo_name=repository_name,
-				user_id=user.github_id,
-				tracking_started_at=datetime.now(tz=UTC)
-			))
-			db.commit()
-			return JSONResponse(
-				content={"detail": "webhook created"},
-				status_code=status.HTTP_201_CREATED
-			)
+
+			#even if the webhook exists, i cant get its hook_id when the status code is 422, github wont send it, hence i will need to 	use github api to query for webhook details for that particular repo and find the one which was set by my app
+			async with httpx.AsyncClient() as client:
+				webhook_req = await client.get(f"https://api.github.com/repos/{user.github_username}/{repo_name.repo_name}/hooks", headers=headers)
+
+			webhook_data = webhook_req.json()
+
+			if webhook_req.status_code == httpx.codes.OK:
+				hook_id = None
+				#the same repo can have multiple webhooks, so i need to loop through all the webhook of that repo and find that webhook which has the same config url as my backend payload delivery url, after finding it extract the id and store in db
+				for data in webhook_data:
+					if data["config"]["url"] == f"{backend_ngrok}/webhook-payload":
+						hook_id = data["id"]
+						break
+
+				if hook_id is None:
+					raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="No webhook for Repo Signals")
+
+				db.add(TrackedRepo(
+					repo_id=repository_id,
+					repo_name=repository_name,
+					user_id=user.github_id,
+					tracking_started_at=datetime.now(tz=UTC),
+					hook_id=hook_id
+				))
+				db.commit()
+				return JSONResponse(
+					content={"detail": "webhook created"},
+					status_code=status.HTTP_201_CREATED
+				)
+			else:
+				raise HTTPException(status_code=webhook_req.status_code, detail="failed to create webhook")
 		else:
 			raise HTTPException(status_code=webhook.status_code, detail="failed to create webhook")
 
