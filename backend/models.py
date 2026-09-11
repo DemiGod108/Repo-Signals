@@ -1,5 +1,5 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, mapper
-from sqlalchemy import ForeignKey, UniqueConstraint, ForeignKeyConstraint, null
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import ForeignKey, UniqueConstraint, ForeignKeyConstraint
 from datetime import datetime
 from sqlalchemy import DateTime
 from sqlalchemy.types import JSON
@@ -48,7 +48,7 @@ class TrackedRepo(Base):
 	repo_id: Mapped[int] = mapped_column()
 	repo_name: Mapped[str] = mapped_column()
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
-	hook_id: Mapped[int | None] = mapped_column(default=None, nullable=True)
+	hook_id: Mapped[int] = mapped_column()
 	tracking_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 	__table_args__ = (
