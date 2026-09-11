@@ -131,6 +131,7 @@ def etl_dag():
 			todays_activity_count = 0
 			health_metric_dto[repo_id] = {"user_id": repo_data.get("user_id")}
 
+			#converting string passed through XComs and converting it back into a native datetime.datetime object
 			tracking_started_at = datetime.fromisoformat(repo_data["tracking_started_at"]).date()
 
 			#today and tracking_started_at are both datetime.datetime objects, when we subtract two datetime objects we get datetime.timedelta object, min() doesnt work on datetime.timedelta objects, hence using .days to get an interger value that can be compared with 28

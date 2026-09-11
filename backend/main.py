@@ -24,7 +24,7 @@ app.include_router(live_feed.router)
 app.include_router(display_repos.router)
 app.include_router(overview.router)
 app.include_router(health_metrics.router)
-app.include_router(delete_webhook)
+app.include_router(delete_webhook.router)
 
 origins = [
 	"http://localhost:3000",

@@ -4,6 +4,7 @@ from models import Users, TrackedRepo
 from utils.auth import get_current_user
 from database import get_db
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 router = APIRouter()
 
@@ -17,9 +18,11 @@ def display_tracked_repos(user: Users = Depends(get_current_user), db: Session =
 	#creating a neat data structure to return to the frontend
 	response_list = []
 	for obj in tracked_repo_obj:
+		tracking_started_at = obj.tracking_started_at.isoformat() #the timedate info stored in db is a datetime.datetime object and its not json serializable hence need to convert into json safe format
 		each_repo = {
 			"repo_id": obj.repo_id,
-			"repo_name": obj.repo_name
+			"repo_name": obj.repo_name,
+			"tracking_started_at": tracking_started_at
 		}
 		response_list.append(each_repo)
 

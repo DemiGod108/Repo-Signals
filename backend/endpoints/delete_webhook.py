@@ -9,7 +9,7 @@ from database import get_db
 
 router = APIRouter()
 
-@router.delete("/delete-webhook")
+@router.delete("/stop-monitoring/{repo_id}")
 async def delete_webhook(repo_id: int, user: Users = Depends(get_current_user), db: Session = Depends(get_db)):
 
 	#perform authorization
