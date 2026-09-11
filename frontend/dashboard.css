@@ -1,912 +1,817 @@
-/* -------------------------------------------------- */
-/* Dashboard Layout */
-/* -------------------------------------------------- */
-
 #dashboard-container {
 	max-width: 1180px;
 	padding-top: 48px;
 	padding-bottom: 72px;
+	animation: dashboard-page-enter 0.45s ease-out both;
 }
 
 
-/* -------------------------------------------------- */
-/* Dashboard Header */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Dashboard header
+--------------------------------------------------------- */
 
 .dashboard-header {
 	display: flex;
-	flex-direction: row;
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 40px;
-
-	padding-top: 4px;
-	padding-bottom: 32px;
-
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: var(--color-border);
+	padding-bottom: 34px;
+	border-bottom: 1px solid var(--color-border);
 }
 
-
-.dashboard-heading {
-	max-width: 720px;
+.dashboard-header-content {
+	max-width: 700px;
 }
-
 
 .dashboard-eyebrow {
 	margin-bottom: 10px;
-
-	color: #8995a8;
-
-	font-family: 'JetBrains Mono', monospace;
+	color: var(--color-accent);
 	font-size: 0.75rem;
-	font-weight: 500;
-	letter-spacing: 0.08em;
+	font-weight: 700;
 	line-height: 1.4;
-	text-transform: uppercase;
+	letter-spacing: 0.08em;
 }
-
 
 .dashboard-header h1 {
 	margin-bottom: 10px;
-
-	color: #f2f4f7;
-
 	font-size: 2.35rem;
-	font-weight: 700;
-	line-height: 1.12;
-	letter-spacing: -0.035em;
+	line-height: 1.15;
 }
-
 
 .dashboard-subhead {
-	max-width: 650px;
-
-	color: #a3abb7;
-
+	color: var(--color-text-secondary);
 	font-size: 1rem;
-	line-height: 1.7;
+	line-height: 1.6;
 }
 
 
-/* -------------------------------------------------- */
-/* Add Repository Button */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Primary action
+--------------------------------------------------------- */
 
-#add-repository-button {
+.primary-action {
 	display: inline-flex;
-	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-
 	gap: 8px;
-
 	flex-shrink: 0;
-
-	padding-top: 11px;
-	padding-bottom: 11px;
-	padding-left: 17px;
-	padding-right: 17px;
-
+	min-height: 40px;
+	padding: 9px 15px;
+	border: 1px solid transparent;
 	border-radius: 5px;
-
+	background-color: var(--color-accent);
+	color: #101214;
 	font-size: 0.875rem;
-	font-weight: 600;
-
-	box-shadow:
-		0px 1px 2px rgba(0, 0, 0, 0.25);
+	font-weight: 700;
+	line-height: 1.4;
+	text-decoration: none;
+	transition-property: background-color, transform, box-shadow;
+	transition-duration: 0.16s;
+	transition-timing-function: ease-out;
 }
 
+.primary-action:hover {
+	background-color: var(--color-accent-hover);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(79, 143, 247, 0.16);
+	text-decoration: none;
+}
 
-#add-repository-button span:first-child {
-	font-size: 1rem;
-	font-weight: 500;
+.primary-action:active {
+	transform: translateY(0);
+	box-shadow: none;
+}
+
+.primary-action:focus-visible {
+	outline: 2px solid var(--color-text-primary);
+	outline-offset: 3px;
+}
+
+.primary-action span:first-child {
+	font-size: 1.1rem;
+	font-weight: 600;
 	line-height: 1;
 }
 
 
-#add-repository-button:hover {
-	transform: translateY(-1px);
-}
+/* ---------------------------------------------------------
+   Repository section
+--------------------------------------------------------- */
 
-
-/* -------------------------------------------------- */
-/* Repository Section */
-/* -------------------------------------------------- */
-
-#repositories-section {
+.repositories-section {
 	margin-top: 30px;
-
-	padding-top: 0;
 }
 
-
-.section-heading {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-end;
-	justify-content: space-between;
-
+.repositories-section-header {
 	margin-bottom: 14px;
 }
 
-
-.section-heading h2 {
-	margin-bottom: 4px;
-
-	color: #f1f3f6;
-
-	font-size: 1.125rem;
-	font-weight: 650;
-	line-height: 1.4;
-	letter-spacing: -0.015em;
-}
-
-
-#repository-count {
-	font-size: 0.8125rem;
+.repository-count {
+	color: var(--color-text-muted);
+	font-size: 0.875rem;
 	line-height: 1.5;
 }
 
 
-/* -------------------------------------------------- */
-/* Repository List */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Repository list
+--------------------------------------------------------- */
 
 .repository-list {
-	display: flex;
-	flex-direction: column;
-
 	overflow: hidden;
-
-	border-width: 1px;
-	border-style: solid;
-	border-color: var(--color-border);
+	border: 1px solid var(--color-border);
 	border-radius: 7px;
-
-	background-color: #171819;
-
-	box-shadow:
-		0px 1px 2px rgba(0, 0, 0, 0.18),
-		0px 10px 30px rgba(0, 0, 0, 0.12);
+	background-color: var(--color-surface);
 }
 
-
-/* -------------------------------------------------- */
-/* Repository Item */
-/* -------------------------------------------------- */
-
-.repository-item {
-	position: relative;
-
+.repository-row {
 	display: flex;
-	flex-direction: row;
 	align-items: center;
-	justify-content: space-between;
-
 	gap: 24px;
-
 	min-height: 88px;
-
-	padding-top: 17px;
-	padding-bottom: 17px;
-	padding-left: 18px;
-	padding-right: 18px;
-
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #282a2d;
-
-	cursor: pointer;
-
-	transition-property:
-		background-color,
-		padding-left,
-		padding-right;
-
-	transition-duration: 0.15s;
+	padding: 18px 20px;
+	border-bottom: 1px solid var(--color-border);
+	transition-property: background-color, padding-left;
+	transition-duration: 0.16s;
 	transition-timing-function: ease-out;
+
+	animation-name: repository-row-enter;
+	animation-duration: 0.4s;
+	animation-timing-function: ease-out;
+	animation-fill-mode: both;
 }
 
+.repository-row:nth-child(1) {
+	animation-delay: 0.08s;
+}
 
-.repository-item:last-child {
+.repository-row:nth-child(2) {
+	animation-delay: 0.14s;
+}
+
+.repository-row:nth-child(3) {
+	animation-delay: 0.20s;
+}
+
+.repository-row:nth-child(4) {
+	animation-delay: 0.26s;
+}
+
+.repository-row:nth-child(5) {
+	animation-delay: 0.32s;
+}
+
+.repository-row:nth-child(6) {
+	animation-delay: 0.38s;
+}
+
+.repository-row:hover {
+	background-color: rgba(255, 255, 255, 0.025);
+	padding-left: 22px;
+}
+
+.repository-row:last-child {
 	border-bottom: 0;
 }
 
 
-.repository-item::before {
-	content: '';
+/* ---------------------------------------------------------
+   Repository information
+--------------------------------------------------------- */
 
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-
-	width: 2px;
-
-	background-color: transparent;
-
-	transition-property: background-color;
-	transition-duration: 0.15s;
-	transition-timing-function: ease-out;
-}
-
-
-.repository-item:hover {
-	background-color: #1b1d1f;
-
-	padding-left: 22px;
-	padding-right: 22px;
-}
-
-
-.repository-item:hover::before {
-	background-color: var(--color-accent);
-}
-
-
-/* -------------------------------------------------- */
-/* Repository Main */
-/* -------------------------------------------------- */
-
-.repository-main {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	gap: 14px;
-
+.repository-information {
 	min-width: 0;
+	flex: 1;
 }
-
-
-.repository-mark {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-
-	width: 38px;
-	height: 38px;
-
-	flex-shrink: 0;
-
-	border-width: 1px;
-	border-style: solid;
-	border-color: #32353a;
-	border-radius: 6px;
-
-	background-color: #1d1f22;
-
-	color: #aeb6c2;
-
-	font-size: 0.875rem;
-	font-weight: 700;
-
-	transition-property:
-		background-color,
-		border-color,
-		color;
-
-	transition-duration: 0.15s;
-}
-
-
-.repository-item:hover .repository-mark {
-	border-color: rgba(79, 143, 247, 0.35);
-
-	background-color: rgba(79, 143, 247, 0.08);
-
-	color: #8db8ff;
-}
-
-
-.repository-info {
-	min-width: 0;
-}
-
 
 .repository-name {
 	overflow: hidden;
-
-	margin-bottom: 5px;
-
-	color: #eef1f5;
-
+	margin-bottom: 4px;
+	color: var(--color-text-primary);
 	font-size: 1rem;
 	font-weight: 600;
-	line-height: 1.4;
-
+	line-height: 1.45;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-
 .repository-meta {
-	color: #7f8996;
-
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 0.75rem;
+	color: var(--color-text-muted);
+	font-size: 0.8125rem;
 	line-height: 1.5;
 }
 
 
-/* -------------------------------------------------- */
-/* Repository Action */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Repository actions
+--------------------------------------------------------- */
+
+.repository-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-shrink: 0;
+}
 
 .repository-action {
 	display: inline-flex;
-	flex-direction: row;
 	align-items: center;
-
-	gap: 8px;
-
-	flex-shrink: 0;
-
-	color: #8993a0;
-
-	font-size: 0.8125rem;
+	justify-content: center;
+	min-height: 34px;
+	padding: 7px 10px;
+	border-radius: 5px;
+	font-size: 0.875rem;
 	font-weight: 500;
-	line-height: 1.5;
-
-	transition-property: color;
+	line-height: 1.4;
+	white-space: nowrap;
+	transition-property: background-color, border-color, color, transform;
 	transition-duration: 0.15s;
 	transition-timing-function: ease-out;
 }
 
-
-.repository-arrow {
-	color: #6f7885;
-
-	font-size: 0.9375rem;
-
-	transition-property:
-		transform,
-		color;
-
-	transition-duration: 0.15s;
-	transition-timing-function: ease-out;
-}
-
-
-.repository-item:hover .repository-action {
-	color: #d8dde4;
-}
-
-
-.repository-item:hover .repository-arrow {
-	transform: translateX(3px);
-
+.repository-view-action {
 	color: var(--color-accent);
+	cursor: pointer;
+}
+
+.repository-view-action:hover {
+	color: #79a8f7;
+	text-decoration: none;
+	transform: translateX(2px);
+}
+
+.repository-view-action:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+.stop-monitoring-button {
+	border: 1px solid transparent;
+	background-color: transparent;
+	color: var(--color-text-muted);
+}
+
+.stop-monitoring-button:hover {
+	border-color: rgba(229, 83, 75, 0.3);
+	background-color: rgba(229, 83, 75, 0.07);
+	color: #df8681;
+	transform: none;
+}
+
+.stop-monitoring-button:focus-visible {
+	outline: 2px solid #d66a64;
+	outline-offset: 2px;
 }
 
 
-/* -------------------------------------------------- */
-/* Empty / Loading / Error States */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Loading / empty / error states
+--------------------------------------------------------- */
 
 .repository-state {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-
-	min-height: 250px;
-
-	padding-top: 40px;
-	padding-bottom: 40px;
-	padding-left: 32px;
-	padding-right: 32px;
-
-	background-color: #171819;
-
+	gap: 10px;
+	min-height: 160px;
+	padding: 32px 24px;
 	text-align: center;
 }
 
-
 .repository-state p {
-	max-width: 440px;
-
-	color: #929ba7;
-
-	font-size: 0.875rem;
-	line-height: 1.65;
+	margin: 0;
 }
 
+.repository-state > p:not(.repository-empty-title) {
+	color: var(--color-text-muted);
+	font-size: 0.875rem;
+	line-height: 1.6;
+}
 
 .repository-empty-title {
-	margin-bottom: 7px;
-
-	color: #edf0f4 !important;
-
-	font-size: 1rem !important;
+	color: var(--color-text-primary);
+	font-size: 1rem;
 	font-weight: 600;
+	line-height: 1.4;
 }
-
 
 .repository-empty-description {
-	max-width: 430px;
-
-	margin-bottom: 20px;
+	max-width: 460px;
+	color: var(--color-text-muted);
+	font-size: 0.875rem;
+	line-height: 1.6;
 }
-
 
 .repository-empty-action {
-	padding-top: 9px;
-	padding-bottom: 9px;
-	padding-left: 14px;
-	padding-right: 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 38px;
+	margin-top: 8px;
+	padding: 8px 14px;
+	border: 1px solid #383838;
+	border-radius: 5px;
+	background-color: transparent;
+	color: var(--color-text-secondary);
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+	transition-property: background-color, border-color, color, transform;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+}
 
-	font-size: 0.8125rem;
+.repository-empty-action:hover {
+	border-color: #4a4a4a;
+	background-color: rgba(255, 255, 255, 0.04);
+	color: var(--color-text-primary);
+	transform: translateY(-1px);
+}
+
+.repository-empty-action:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
 }
 
 
-/* -------------------------------------------------- */
-/* Add Repository Modal */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Modal overlay
+--------------------------------------------------------- */
 
 .modal-overlay {
 	position: fixed;
-
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-
+	inset: 0;
 	z-index: 100;
-
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
 	padding: 24px;
-
-	background-color: rgba(5, 6, 8, 0.72);
-
-	backdrop-filter: blur(3px);
+	background-color: rgba(0, 0, 0, 0.68);
+	animation: modal-overlay-enter 0.18s ease-out both;
 }
-
 
 .modal-overlay[hidden] {
 	display: none;
 }
 
 
-.modal {
+/* ---------------------------------------------------------
+   Modal card
+--------------------------------------------------------- */
+
+.modal-card {
 	width: 100%;
 	max-width: 440px;
-
-	overflow: hidden;
-
-	background-color: #191a1c;
-
-	border-width: 1px;
-	border-style: solid;
-	border-color: #34373b;
-	border-radius: 8px;
-
-	box-shadow:
-		0px 24px 60px rgba(0, 0, 0, 0.45);
-
-	animation-name: modal-enter;
-	animation-duration: 0.16s;
-	animation-timing-function: ease-out;
+	padding: 28px;
+	border: 1px solid var(--color-border);
+	border-radius: 7px;
+	background-color: #181818;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+	animation: modal-card-enter 0.20s ease-out both;
 }
-
 
 .modal-header {
 	display: flex;
-	flex-direction: row;
 	align-items: flex-start;
 	justify-content: space-between;
-
 	gap: 20px;
-
-	padding-top: 22px;
-	padding-bottom: 18px;
-	padding-left: 23px;
-	padding-right: 18px;
-
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #2b2e31;
+	margin-bottom: 24px;
 }
 
+.modal-header > div {
+	min-width: 0;
+}
 
-.modal-eyebrow {
+.modal-card h2 {
 	margin-bottom: 8px;
-
-	color: #7f8b9c;
-
-	font-family: 'JetBrains Mono', monospace;
-	font-size: 0.6875rem;
-	font-weight: 500;
-	letter-spacing: 0.08em;
-	line-height: 1.4;
-	text-transform: uppercase;
-}
-
-
-.modal-header h2 {
-	margin-bottom: 0;
-
-	color: #f0f2f5;
-
-	font-size: 1.25rem;
-	font-weight: 650;
+	font-size: 1.375rem;
 	line-height: 1.3;
 }
 
+.modal-description {
+	color: var(--color-text-secondary);
+	font-size: 0.9375rem;
+	line-height: 1.6;
+}
 
 .modal-close-button {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	width: 32px;
-	height: 32px;
-
 	flex-shrink: 0;
-
+	width: 34px;
+	height: 34px;
 	padding: 0;
-
-	border-width: 0;
-	border-style: none;
-	border-radius: 4px;
-
+	border: 1px solid transparent;
+	border-radius: 5px;
 	background-color: transparent;
-	color: #78818d;
-
-	font-size: 1.25rem;
+	color: var(--color-text-muted);
+	font-size: 1.5rem;
 	font-weight: 400;
 	line-height: 1;
-
-	cursor: pointer;
-}
-
-
-.modal-close-button:hover {
-	background-color: #292c30;
-
-	color: #eef1f4;
-
-	transform: none;
-}
-
-
-.modal-body {
-	padding-top: 22px;
-	padding-bottom: 24px;
-	padding-left: 23px;
-	padding-right: 23px;
-}
-
-
-.modal-description {
-	margin-bottom: 24px;
-
-	color: #9da6b2;
-
-	font-size: 0.9375rem;
-	line-height: 1.65;
-}
-
-
-.form-field {
-	display: flex;
-	flex-direction: column;
-}
-
-
-.form-field label {
-	margin-bottom: 8px;
-
-	color: #dce1e7;
-
-	font-size: 0.8125rem;
-	font-weight: 600;
-	line-height: 1.4;
-}
-
-
-.form-field input {
-	width: 100%;
-
-	padding-top: 12px;
-	padding-bottom: 12px;
-	padding-left: 12px;
-	padding-right: 12px;
-
-	border-width: 1px;
-	border-style: solid;
-	border-color: #34373b;
-	border-radius: 5px;
-
-	background-color: #121314;
-	color: #eef1f4;
-
-	font-family: 'Inter', Arial, sans-serif;
-	font-size: 0.9375rem;
-	line-height: 1.5;
-
-	outline: none;
-
-	transition-property:
-		border-color,
-		box-shadow;
-
+	transition-property: background-color, border-color, color;
 	transition-duration: 0.15s;
 	transition-timing-function: ease-out;
 }
 
-
-.form-field input::placeholder {
-	color: #5f6771;
+.modal-close-button:hover {
+	border-color: var(--color-border);
+	background-color: rgba(255, 255, 255, 0.04);
+	color: var(--color-text-primary);
+	transform: none;
 }
 
+.modal-close-button:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+
+/* ---------------------------------------------------------
+   Form
+--------------------------------------------------------- */
+
+.form-field {
+	margin-bottom: 10px;
+}
+
+.form-field label {
+	display: block;
+	margin-bottom: 8px;
+	color: var(--color-text-primary);
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.form-field input {
+	width: 100%;
+	min-height: 44px;
+	padding: 10px 12px;
+	border: 1px solid #363636;
+	border-radius: 5px;
+	outline: none;
+	background-color: #121212;
+	color: var(--color-text-primary);
+	font-family: 'Inter', Arial, sans-serif;
+	font-size: 0.9375rem;
+	line-height: 1.5;
+	transition-property: border-color, box-shadow;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+}
+
+.form-field input::placeholder {
+	color: #6f6f6f;
+}
+
+.form-field input:hover {
+	border-color: #474747;
+}
 
 .form-field input:focus {
 	border-color: var(--color-accent);
-
-	box-shadow:
-		0px 0px 0px 2px rgba(79, 143, 247, 0.12);
+	box-shadow: 0 0 0 2px rgba(79, 143, 247, 0.12);
 }
 
-
-.form-field input:invalid:not(:placeholder-shown) {
-	border-color: var(--color-warning);
-}
-
-
-.form-help {
+.form-message {
+	min-height: 22px;
 	margin-top: 8px;
+	color: var(--color-warning);
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
 
-	color: #7f8995;
+.form-message:empty {
+	margin-top: 0;
+}
 
-	font-size: 0.75rem;
+
+/* ---------------------------------------------------------
+   Modal actions
+--------------------------------------------------------- */
+
+.modal-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 22px;
+}
+
+.secondary-button,
+.danger-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	padding: 9px 15px;
+	border-radius: 5px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.secondary-button {
+	border: 1px solid #383838;
+	background-color: transparent;
+	color: var(--color-text-secondary);
+	transition-property: background-color, border-color, color;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+}
+
+.secondary-button:hover {
+	border-color: #4a4a4a;
+	background-color: rgba(255, 255, 255, 0.035);
+	color: var(--color-text-primary);
+	transform: none;
+}
+
+.secondary-button:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+.danger-button {
+	border: 1px solid #b94f4a;
+	background-color: #b94f4a;
+	color: #ffffff;
+	transition-property: background-color, border-color, transform;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+}
+
+.danger-button:hover {
+	border-color: #ca5b55;
+	background-color: #ca5b55;
+	transform: translateY(-1px);
+}
+
+.danger-button:active {
+	transform: translateY(0);
+}
+
+.danger-button:focus-visible {
+	outline: 2px solid #df8681;
+	outline-offset: 2px;
+}
+
+
+/* ---------------------------------------------------------
+   Stop monitoring confirmation
+--------------------------------------------------------- */
+
+.confirmation-detail {
+	margin-top: 18px;
+	padding: 13px 14px;
+	border: 1px solid rgba(229, 83, 75, 0.18);
+	border-radius: 5px;
+	background-color: rgba(229, 83, 75, 0.05);
+	color: var(--color-text-secondary);
+	font-size: 0.875rem;
 	line-height: 1.55;
 }
 
 
-.form-message {
-	min-height: 19px;
+/* ---------------------------------------------------------
+   Animations
+--------------------------------------------------------- */
 
-	margin-top: 12px;
-
-	font-size: 0.8125rem;
-	line-height: 1.5;
-}
-
-
-.form-message:not(:empty) {
-	margin-bottom: 4px;
-}
-
-
-.form-message-error {
-	color: var(--color-warning);
-}
-
-
-.form-message-success {
-	color: var(--color-success);
-}
-
-
-.modal-actions {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-end;
-
-	gap: 10px;
-
-	margin-top: 20px;
-}
-
-
-.modal-actions button {
-	font-size: 0.8125rem;
-
-	padding-top: 9px;
-	padding-bottom: 9px;
-	padding-left: 15px;
-	padding-right: 15px;
-}
-
-
-.secondary-button {
-	background-color: transparent;
-	color: #929aa6;
-
-	border-width: 1px;
-	border-style: solid;
-	border-color: #34373b;
-}
-
-
-.secondary-button:hover {
-	background-color: #292c30;
-	color: #eef1f4;
-}
-
-
-/* -------------------------------------------------- */
-/* Motion */
-/* -------------------------------------------------- */
-
-@keyframes modal-enter {
-
+@keyframes dashboard-page-enter {
 	from {
 		opacity: 0;
-
-		transform:
-			translateY(5px)
-			scale(0.99);
+		transform: translateY(8px);
 	}
 
 	to {
 		opacity: 1;
+		transform: translateY(0);
+	}
+}
 
-		transform:
-			translateY(0)
-			scale(1);
+@keyframes repository-row-enter {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
 	}
 
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes modal-overlay-enter {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes modal-card-enter {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.985);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
 }
 
 
-/* -------------------------------------------------- */
-/* Responsive */
-/* -------------------------------------------------- */
+/* ---------------------------------------------------------
+   Reduced motion
+--------------------------------------------------------- */
 
-@media (max-width: 700px) {
-
-	#dashboard-container {
-		padding-top: 32px;
+@media (prefers-reduced-motion: reduce) {
+	#dashboard-container,
+	.repository-row,
+	.modal-overlay,
+	.modal-card {
+		animation: none;
 	}
 
+	.primary-action,
+	.repository-row,
+	.repository-action,
+	.repository-view-action,
+	.stop-monitoring-button,
+	.repository-empty-action,
+	.form-field input,
+	.modal-close-button,
+	.secondary-button,
+	.danger-button {
+		transition: none;
+	}
+}
+
+
+/* ---------------------------------------------------------
+   Responsive layout
+--------------------------------------------------------- */
+
+@media (max-width: 800px) {
+	.dashboard-header {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.dashboard-header-content {
+		max-width: 100%;
+	}
+
+	.repository-row {
+		align-items: flex-start;
+	}
+
+	.repository-actions {
+		align-self: center;
+	}
+}
+
+
+@media (max-width: 650px) {
+	#dashboard-container {
+		padding-top: 34px;
+		padding-bottom: 52px;
+	}
 
 	.dashboard-header {
-		flex-direction: column;
-		align-items: stretch;
-
-		gap: 22px;
-
-		padding-bottom: 26px;
+		padding-bottom: 28px;
 	}
-
 
 	.dashboard-header h1 {
-		font-size: 1.9rem;
+		font-size: 2rem;
 	}
-
 
 	.dashboard-subhead {
 		font-size: 0.9375rem;
 	}
 
-
-	#add-repository-button {
-		align-self: flex-start;
+	.repository-row {
+		gap: 16px;
+		padding: 16px;
 	}
 
-
-	#repositories-section {
-		margin-top: 26px;
+	.repository-row:hover {
+		padding-left: 18px;
 	}
 
-
-	.repository-item {
-		min-height: 78px;
-
-		gap: 14px;
-
-		padding-left: 14px;
-		padding-right: 14px;
+	.repository-actions {
+		gap: 6px;
 	}
-
-
-	.repository-item:hover {
-		padding-left: 17px;
-		padding-right: 17px;
-	}
-
 
 	.repository-action {
-		font-size: 0;
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+}
+
+
+@media (max-width: 560px) {
+	.repository-row {
+		align-items: flex-start;
 	}
 
-
-	.repository-arrow {
-		font-size: 0.875rem;
+	.repository-actions {
+		align-items: flex-end;
+		flex-direction: column;
 	}
 
+	.repository-view-action,
+	.stop-monitoring-button {
+		min-height: 32px;
+	}
+
+	.modal-overlay {
+		align-items: flex-end;
+		padding: 12px;
+	}
+
+	.modal-card {
+		max-width: none;
+		padding: 24px 20px;
+		border-radius: 7px;
+	}
+
+	.modal-header {
+		margin-bottom: 20px;
+	}
 }
 
 
 @media (max-width: 480px) {
-
 	#dashboard-container {
 		padding-left: 16px;
 		padding-right: 16px;
-
-		padding-top: 28px;
 	}
-
 
 	.dashboard-header h1 {
-		font-size: 1.7rem;
+		font-size: 1.75rem;
 	}
 
+	.dashboard-eyebrow {
+		font-size: 0.75rem;
+	}
 
 	.dashboard-subhead {
-		font-size: 0.875rem;
+		font-size: 0.9375rem;
 	}
 
+	.primary-action {
+		width: 100%;
+	}
 
 	.repository-list {
 		border-radius: 6px;
 	}
 
-
-	.repository-main {
-		gap: 11px;
+	.repository-row {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 14px;
+		padding: 16px;
 	}
 
-
-	.repository-mark {
-		width: 34px;
-		height: 34px;
+	.repository-row:hover {
+		padding-left: 16px;
 	}
 
-
-	.repository-name {
-		font-size: 0.9375rem;
+	.repository-information {
+		width: 100%;
 	}
 
-
-	.modal-overlay {
-		align-items: flex-end;
-
-		padding: 12px;
+	.repository-actions {
+		width: 100%;
+		align-items: stretch;
 	}
 
-
-	.modal {
-		max-width: none;
+	.repository-view-action,
+	.stop-monitoring-button {
+		width: 100%;
 	}
 
-
-	.modal-header,
-	.modal-body {
-		padding-left: 18px;
-		padding-right: 18px;
+	.repositories-section {
+		margin-top: 26px;
 	}
 
-}
-
-
-/* -------------------------------------------------- */
-/* Reduced Motion */
-/* -------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-
-	.modal {
-		animation: none;
+	.modal-actions {
+		flex-direction: column-reverse;
+		align-items: stretch;
 	}
 
-
-	.repository-item,
-	.repository-item::before,
-	.repository-mark,
-	.repository-action,
-	.repository-arrow,
-	#add-repository-button {
-		transition: none;
+	.secondary-button,
+	.danger-button {
+		width: 100%;
 	}
-
 }

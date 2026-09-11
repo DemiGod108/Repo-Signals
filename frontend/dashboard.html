@@ -4,23 +4,25 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<title>Dashboard — Repo Signals</title>
+	<title>Tracked Repositories — Repo Signals</title>
 
-	<link rel="stylesheet" href="./common.css">
-	<link rel="stylesheet" href="./navbar.css">
-	<link rel="stylesheet" href="./dashboard.css">
+	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="navbar.css">
+	<link rel="stylesheet" href="dashboard.css">
 </head>
 
 <body>
-
 	<main id="dashboard-container" class="container">
 
 		<header class="dashboard-header">
+			<div class="dashboard-header-content">
+				<p class="dashboard-eyebrow">
+					REPOSITORIES
+				</p>
 
-			<div class="dashboard-heading">
-				<p class="dashboard-eyebrow">REPOSITORIES</p>
-
-				<h1>Tracked repositories</h1>
+				<h1>
+					Tracked repositories
+				</h1>
 
 				<p class="dashboard-subhead">
 					Monitor repository activity and health metrics from one place.
@@ -30,27 +32,22 @@
 			<button
 				type="button"
 				id="add-repository-button"
+				class="primary-action"
 			>
 				<span aria-hidden="true">+</span>
 				<span>Add repository</span>
 			</button>
-
 		</header>
 
 
-		<section
-			id="repositories-section"
-			aria-labelledby="repositories-heading"
-		>
-
-			<div class="section-heading">
-				<div>
-					<h2 id="repositories-heading">Your repositories</h2>
-
-					<p id="repository-count" class="text-muted">
-						Loading repositories...
-					</p>
-				</div>
+		<section class="repositories-section">
+			<div class="repositories-section-header">
+				<p
+					id="repository-count"
+					class="repository-count"
+				>
+					Loading repositories...
+				</p>
 			</div>
 
 
@@ -59,129 +56,182 @@
 				class="repository-list"
 			>
 				<div
-					id="repository-loading"
+					id="repository-loading-state"
 					class="repository-state"
-					role="status"
-					aria-live="polite"
 				>
-					<p>Loading tracked repositories...</p>
+					<p>
+						Loading tracked repositories...
+					</p>
 				</div>
 			</div>
-
 		</section>
 
 	</main>
 
 
-	<!-- Add Repository Modal -->
+	<!-- Add repository modal -->
+
 	<div
 		id="add-repository-modal"
 		class="modal-overlay"
 		hidden
 	>
-
-		<section
-			class="modal"
+		<div
+			class="modal-card"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="add-repository-title"
-			aria-describedby="add-repository-description"
 		>
 
 			<div class="modal-header">
-
 				<div>
-					<p class="modal-eyebrow">REPOSITORY SETUP</p>
-
 					<h2 id="add-repository-title">
 						Add repository
 					</h2>
+
+					<p class="modal-description">
+						Add a repository from your GitHub account to start
+						tracking its activity and health.
+					</p>
 				</div>
 
 				<button
 					type="button"
-					id="close-modal-button"
+					id="close-add-repository-modal"
 					class="modal-close-button"
 					aria-label="Close add repository dialog"
 				>
-					&times;
+					<span aria-hidden="true">×</span>
 				</button>
-
 			</div>
 
 
-			<div class="modal-body">
+			<form id="add-repository-form">
+
+				<div class="form-field">
+					<label for="repository-name">
+						Repository name
+					</label>
+
+					<input
+						type="text"
+						id="repository-name"
+						name="repository-name"
+						placeholder="repository-name"
+						autocomplete="off"
+						required
+					>
+				</div>
+
 
 				<p
-					id="add-repository-description"
-					class="modal-description"
-				>
-					Add a repository from your GitHub account to start tracking its signals.
-				</p>
+					id="add-repository-message"
+					class="form-message"
+					aria-live="polite"
+				></p>
 
 
-				<form id="add-repository-form">
+				<div class="modal-actions">
+					<button
+						type="button"
+						id="cancel-add-repository"
+						class="secondary-button"
+					>
+						Cancel
+					</button>
 
-					<div class="form-field">
+					<button
+						type="submit"
+						id="submit-add-repository"
+						class="primary-action"
+					>
+						Add repository
+					</button>
+				</div>
 
-						<label for="repository-name">
-							Repository name
-						</label>
+			</form>
 
-						<input
-							type="text"
-							id="repository-name"
-							name="repository-name"
-							placeholder="my-project"
-							autocomplete="off"
-							required
-						>
-
-						<p class="form-help">
-							Enter the repository name exactly as it appears in your GitHub account.
-						</p>
-
-					</div>
-
-
-					<div
-						id="add-repository-message"
-						class="form-message"
-						role="alert"
-						aria-live="polite"
-					></div>
-
-
-					<div class="modal-actions">
-
-						<button
-							type="button"
-							id="cancel-add-repository-button"
-							class="secondary-button"
-						>
-							Cancel
-						</button>
-
-						<button
-							type="submit"
-							id="submit-add-repository-button"
-						>
-							Add repository
-						</button>
-
-					</div>
-
-				</form>
-
-			</div>
-
-		</section>
-
+		</div>
 	</div>
 
 
-	<script type="module" src="./navbar.js"></script>
-	<script type="module" src="./dashboard.js"></script>
+	<!-- Stop monitoring confirmation modal -->
+
+	<div
+		id="stop-monitoring-modal"
+		class="modal-overlay"
+		hidden
+	>
+		<div
+			class="modal-card confirmation-modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="stop-monitoring-title"
+		>
+
+			<div class="modal-header">
+				<div>
+					<h2 id="stop-monitoring-title">
+						Stop monitoring?
+					</h2>
+
+					<p class="modal-description">
+						Repo Signals will stop collecting activity for
+						<span id="stop-monitoring-repository-name">
+							this repository
+						</span>.
+						Your GitHub repository will not be deleted.
+					</p>
+				</div>
+
+				<button
+					type="button"
+					id="close-stop-monitoring-modal"
+					class="modal-close-button"
+					aria-label="Close stop monitoring dialog"
+				>
+					<span aria-hidden="true">×</span>
+				</button>
+			</div>
+
+
+			<p class="confirmation-detail">
+				This repository will be removed from your Repo Signals
+				dashboard and its monitoring webhook will be removed.
+			</p>
+
+
+			<div class="modal-actions">
+				<button
+					type="button"
+					id="cancel-stop-monitoring"
+					class="secondary-button"
+				>
+					Cancel
+				</button>
+
+				<button
+					type="button"
+					id="confirm-stop-monitoring"
+					class="danger-button"
+				>
+					Stop monitoring
+				</button>
+			</div>
+
+		</div>
+	</div>
+
+
+	<script
+		type="module"
+		src="navbar.js"
+	></script>
+
+	<script
+		type="module"
+		src="dashboard.js"
+	></script>
 
 </body>
 </html>
