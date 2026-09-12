@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Repository — Repo Signals</title>
+
+	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="navbar.css">
+	<link rel="stylesheet" href="repo.css">
+</head>
+
+<body>
+	<main id="repo-container" class="container">
+
+		<header class="repo-header">
+			<div class="repo-header-content">
+
+				<a
+					href="./dashboard.html"
+					class="back-to-dashboard"
+				>
+					<span aria-hidden="true">←</span>
+					<span>Back to repositories</span>
+				</a>
+
+				<p class="repo-eyebrow">
+					REPOSITORY
+				</p>
+
+				<h1 id="repository-title">
+					Loading repository...
+				</h1>
+
+				<p
+					id="repository-subtitle"
+					class="repo-subtitle"
+				>
+					Loading repository information...
+				</p>
+
+			</div>
+		</header>
+
+
+		<nav
+			class="repo-tabs"
+			aria-label="Repository sections"
+		>
+			<button
+				type="button"
+				id="overview-tab"
+				class="repo-tab is-active"
+				aria-selected="true"
+				aria-controls="overview-panel"
+			>
+				Overview
+			</button>
+
+			<button
+				type="button"
+				id="health-metrics-tab"
+				class="repo-tab"
+				aria-selected="false"
+				aria-controls="health-metrics-panel"
+			>
+				Health Metrics
+			</button>
+		</nav>
+
+
+		<section
+			id="overview-panel"
+			class="repo-tab-panel"
+			role="tabpanel"
+			aria-labelledby="overview-tab"
+		>
+
+			<section
+				class="repo-section"
+				aria-labelledby="overview-heading"
+			>
+
+				<div class="repo-section-header">
+					<div>
+						<p class="repo-section-eyebrow">
+							OVERVIEW
+						</p>
+
+						<h2 id="overview-heading">
+							Repository overview
+						</h2>
+
+						<p class="repo-section-description">
+							Current repository activity and open work.
+						</p>
+					</div>
+
+					<button
+						type="button"
+						id="reload-overview-button"
+						class="reload-button"
+						aria-label="Reload repository overview"
+						title="Reload overview"
+					>
+						<svg
+							class="reload-icon"
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+						>
+							<path d="M20 11a8.1 8.1 0 0 0-15.5-2"></path>
+							<path d="M4 5v4h4"></path>
+							<path d="M4 13a8.1 8.1 0 0 0 15.5 2"></path>
+							<path d="M20 19v-4h-4"></path>
+						</svg>
+					</button>
+				</div>
+
+
+				<div
+					id="overview-loading-state"
+					class="repo-state"
+				>
+					<p>
+						Loading repository overview...
+					</p>
+				</div>
+
+
+				<div
+					id="overview-error-state"
+					class="repo-state"
+					hidden
+				>
+					<p class="repo-state-title">
+						Unable to load repository overview
+					</p>
+
+					<p class="repo-state-description">
+						Please try again in a moment.
+					</p>
+
+					<button
+						type="button"
+						id="retry-overview-button"
+						class="secondary-button"
+					>
+						Retry
+					</button>
+				</div>
+
+
+				<div
+					id="overview-grid"
+					class="overview-grid"
+					hidden
+				>
+
+					<article class="overview-card">
+						<p class="overview-card-label">
+							Commits
+						</p>
+
+						<p
+							id="overview-commits"
+							class="overview-card-value"
+						>
+							—
+						</p>
+
+						<p class="overview-card-description">
+							Total commits collected
+						</p>
+					</article>
+
+
+					<article class="overview-card">
+						<p class="overview-card-label">
+							Open pull requests
+						</p>
+
+						<p
+							id="overview-open-pull-requests"
+							class="overview-card-value"
+						>
+							—
+						</p>
+
+						<p class="overview-card-description">
+							Currently open
+						</p>
+					</article>
+
+
+					<article class="overview-card">
+						<p class="overview-card-label">
+							Open issues
+						</p>
+
+						<p
+							id="overview-open-issues"
+							class="overview-card-value"
+						>
+							—
+						</p>
+
+						<p class="overview-card-description">
+							Currently open
+						</p>
+					</article>
+
+
+					<article class="overview-card">
+						<p class="overview-card-label">
+							Forks
+						</p>
+
+						<p
+							id="overview-forks"
+							class="overview-card-value"
+						>
+							—
+						</p>
+
+						<p class="overview-card-description">
+							Total forks observed
+						</p>
+					</article>
+
+				</div>
+
+			</section>
+
+
+			<section
+				class="repo-section activity-section"
+				aria-labelledby="activity-heading"
+			>
+
+				<div class="repo-section-header">
+					<div>
+
+						<p class="repo-section-eyebrow">
+							LIVE FEED
+						</p>
+
+						<div class="activity-heading-row">
+							<h2 id="activity-heading">
+								GitHub Activity
+							</h2>
+
+							<span
+								id="activity-connection-status"
+								class="connection-status connecting"
+							>
+								Connecting...
+							</span>
+						</div>
+
+						<p class="repo-section-description">
+							Live events received from GitHub as they happen.
+						</p>
+
+					</div>
+				</div>
+
+
+				<div
+					id="activity-feed"
+					class="activity-feed"
+				>
+
+					<div
+						id="activity-empty-state"
+						class="repo-state"
+					>
+						<p>
+							Waiting for new GitHub activity...
+						</p>
+					</div>
+
+				</div>
+
+			</section>
+
+		</section>
+
+
+		<section
+			id="health-metrics-panel"
+			class="repo-tab-panel"
+			role="tabpanel"
+			aria-labelledby="health-metrics-tab"
+			hidden
+		>
+
+			<section
+				class="repo-section"
+				aria-labelledby="health-heading"
+			>
+
+				<div class="repo-section-header">
+
+					<div>
+						<p class="repo-section-eyebrow">
+							HEALTH METRICS
+						</p>
+
+						<h2 id="health-heading">
+							Repository health
+						</h2>
+
+						<p class="repo-section-description">
+							Signals derived from the activity collected
+							for this repository.
+						</p>
+					</div>
+
+
+					<button
+						type="button"
+						id="reload-health-button"
+						class="reload-button"
+						aria-label="Reload health metrics"
+						title="Reload health metrics"
+					>
+						<svg
+							class="reload-icon"
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+						>
+							<path d="M20 11a8.1 8.1 0 0 0-15.5-2"></path>
+							<path d="M4 5v4h4"></path>
+							<path d="M4 13a8.1 8.1 0 0 0 15.5 2"></path>
+							<path d="M20 19v-4h-4"></path>
+						</svg>
+					</button>
+
+				</div>
+
+
+				<div
+					id="health-loading-state"
+					class="repo-state"
+				>
+					<p>
+						Loading health metrics...
+					</p>
+				</div>
+
+
+				<div
+					id="health-error-state"
+					class="repo-state"
+					hidden
+				>
+					<p class="repo-state-title">
+						Unable to load health metrics
+					</p>
+
+					<p class="repo-state-description">
+						Please try again in a moment.
+					</p>
+
+					<button
+						type="button"
+						id="retry-health-button"
+						class="secondary-button"
+					>
+						Retry
+					</button>
+				</div>
+
+
+				<div
+					id="health-content"
+					hidden
+				>
+
+					<!-- Spike / decline -->
+
+					<section class="health-feature-card">
+						<div class="health-feature-header">
+
+							<div>
+								<p class="health-card-label">
+									ACTIVITY TREND
+								</p>
+
+								<h3>
+									Spike / decline
+								</h3>
+
+								<p
+									id="spike-decline-description"
+									class="health-card-description"
+								>
+									—
+								</p>
+							</div>
+
+
+							<span
+								id="spike-decline-status"
+								class="health-status"
+							>
+								—
+							</span>
+
+						</div>
+
+
+						<div class="trend-unavailable">
+
+							<div class="trend-unavailable-icon">
+								<svg
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path d="M4 18L9 13L13 16L20 7"></path>
+								</svg>
+							</div>
+
+							<div>
+								<p>
+									20-day activity trend
+								</p>
+
+								<span>
+									Historical activity data will appear here
+									once the 20-day trend endpoint is connected.
+								</span>
+							</div>
+
+						</div>
+
+					</section>
+
+
+					<!-- Bus factor -->
+
+					<section class="health-feature-card">
+
+						<div class="health-card-header">
+
+							<div>
+								<p class="health-card-label">
+									CONTRIBUTOR CONCENTRATION
+								</p>
+
+								<h3>
+									Bus factor
+								</h3>
+							</div>
+
+						</div>
+
+
+						<div class="bus-factor-layout">
+
+							<div class="bus-factor-chart-wrapper">
+
+								<canvas
+									id="bus-factor-chart"
+									aria-label="Bus factor contributor distribution"
+								></canvas>
+
+								<div
+									id="bus-factor-chart-empty"
+									class="chart-empty-state"
+									hidden
+								>
+									<p>
+										No data yet
+									</p>
+								</div>
+
+							</div>
+
+
+							<div
+								id="bus-factor-legend"
+								class="bus-factor-legend"
+							>
+								<!-- Generated by repo.js -->
+							</div>
+
+						</div>
+
+					</section>
+
+
+					<!-- PR lifecycle -->
+
+					<section class="health-feature-card">
+
+						<div class="health-card-header">
+
+							<div>
+								<p class="health-card-label">
+									PULL REQUESTS
+								</p>
+
+								<h3>
+									PR lifecycle health
+								</h3>
+							</div>
+
+						</div>
+
+
+						<div class="pr-lifecycle-grid">
+
+							<div class="pr-lifecycle-stat">
+								<p>
+									Average time to review
+								</p>
+
+								<strong
+									id="average-time-to-review"
+								>
+									—
+								</strong>
+							</div>
+
+
+							<div class="pr-lifecycle-stat">
+								<p>
+									Average time to merge
+								</p>
+
+								<strong
+									id="average-time-to-merge"
+								>
+									—
+								</strong>
+							</div>
+
+						</div>
+
+
+						<p
+							id="pr-lifecycle-description"
+							class="health-card-description"
+						>
+							—
+						</p>
+
+					</section>
+
+
+					<!-- Stale issues -->
+
+					<section class="health-feature-card">
+
+						<div class="health-card-header">
+
+							<div>
+								<p class="health-card-label">
+									ISSUE MAINTENANCE
+								</p>
+
+								<h3>
+									Stale issues
+								</h3>
+							</div>
+
+						</div>
+
+						<div
+							id="stale-issues-content"
+							class="stale-issues-content"
+						>
+							<div class="stale-issues-summary-column">
+								<!-- Generated by repo.js -->
+							</div>
+
+							<div class="stale-issues-list-column">
+								<!-- Generated by repo.js -->
+							</div>
+						</div>
+					</section>
+
+				</div>
+
+			</section>
+
+		</section>
+
+	</main>
+
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/chart.js"
+	></script>
+
+	<script
+		type="module"
+		src="navbar.js"
+	></script>
+
+	<script
+		type="module"
+		src="repo.js"
+	></script>
+</body>
+</html>
