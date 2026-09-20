@@ -4,7 +4,7 @@ Persistent, interpreted health monitoring for GitHub repositories, real-time eve
 
 ## System Architecture
 
-![Repo Signals Architecture](./repo-signals-system-arch.svg)
+![Repo Signals Architecture](./repo-signals-system-arch.png)
 
 ## What this is & what it solves
 
