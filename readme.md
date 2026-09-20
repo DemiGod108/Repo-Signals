@@ -5,7 +5,7 @@ Persistent, interpreted health monitoring for GitHub repositories, real-time eve
 ## System Architecture
 
 ```mermaid
-
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
 flowchart TB
     GH[("GitHub<br/>OAuth + Webhooks")]
 
