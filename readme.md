@@ -4,45 +4,7 @@ Persistent, interpreted health monitoring for GitHub repositories, real-time eve
 
 ## System Architecture
 
-```mermaid
-%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
-flowchart TB
-    GH[("GitHub<br/>OAuth + Webhooks")]
-
-    BACKEND["Backend API (FastAPI)<br/>auth · webhook setup · ingestion · queries"]
-
-    KAFKA[["Kafka (KRaft)<br/>per-repo topics"]]
-
-    DBCONSUMER["DB Consumer<br/>own container · durable · offset committed after write"]
-    LIVECONSUMER["Live-Feed Consumer<br/>in-process (asyncio task) · never commits offsets"]
-
-    APPDB[("Postgres: App DB<br/>Users · RefreshToken · TrackedRepo · EventData · ActiveRepoItems · HealthMetrics")]
-    AFDB[("Postgres:Airflow Metadata<br/>separate instance")]
-
-    AIRFLOW["Airflow <br> nightly ETL DAG<br/>extract → compute 4 health metrics → load"]
-
-    FRONTEND["Frontend <br/>index · login · dashboard · repo pages"]
-    BROWSER(["Browser"])
-
-    GH -- "OAuth code" --> BACKEND
-    GH -- "webhook event" --> BACKEND
-    BACKEND -- "produce" --> KAFKA
-    BACKEND -- "read / write" --> APPDB
-
-    KAFKA -- "consumer group: event-data-reader" --> DBCONSUMER
-    KAFKA -- "consumer group: live-feed" --> LIVECONSUMER
-
-    DBCONSUMER -- "write EventData / ActiveRepoItems" --> APPDB
-    LIVECONSUMER -- "push events via SSE" --> BROWSER
-
-    AIRFLOW -- "extract EventData / load HealthMetrics" --> APPDB
-    AIRFLOW -. "task state" .-> AFDB
-
-    FRONTEND -- "fetch overview / health-metrics" --> BACKEND
-    FRONTEND -- "EventSource" --> LIVECONSUMER
-    FRONTEND == "renders in" ==> BROWSER
-
-```
+![Repo Signals Architecture](./repo-signals-system-arch.svg)
 
 ## What this is & what it solves
 
