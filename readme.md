@@ -130,6 +130,7 @@ repo-signals/
 │   ├── config.js                               # backend URL config
 │   ├── auth.js                                 # 401 → refresh → retry handling
 │   └── messages.js                             # shared dismissible banner/message helper
+├── load-testing/                 				# k6 load tests: Kafka vs. direct-DB latency, crash/duplicate-delivery test, reports
 └── docker-compose.yaml                         # Main docker compose file, that combines other two compose files
 ```
 
@@ -208,6 +209,16 @@ The root `docker-compose.yaml` pulls in the Airflow and backend compose files wi
 ### 5. Turn on the DAG
 
 Airflow creates DAGs paused by default. Open the Airflow UI, find `etl_dag`, and unpause it. It runs nightly at 02:00 IST — until the first run completes for a newly tracked repo, its Health tab will correctly show "insufficient data" for every metric.
+
+## Load Testing
+
+Load tested the webhook ingestion path with k6: Kafka-offloaded writes are
+1.8-2.2x faster (p95) than synchronous DB writes under load, with zero
+failures at up to 100 req/s. Also simulated a consumer crash mid-burst,
+found and fixed a duplicate-insert bug caused when consumer crashes after DB-write and offset-commit,
+verified with a before/after test.
+
+Full methodology, numbers, and reports: [`load-testing/load-testing.md`](./load-testing/load-testing.md)
 
 ## Known limitations & tradeoffs
 
