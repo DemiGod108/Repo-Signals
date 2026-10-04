@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from datetime import datetime, UTC
 from models import EventData, ActiveRepoItems
+from sqlalchemy.exc import IntegrityError
 
 router = APIRouter()
 
@@ -16,7 +17,7 @@ async def webhook_db(request: Request, db: Session = Depends(get_db)):
 	github_user_id = payload["repository"]["owner"]["id"]
 	repo_id = payload["repository"]["id"]
 	trigger_event = request.headers.get("X-Github-Event")
-
+	delivery_id = request.headers.get("X-GitHub-Delivery")
 	enter_to_db = False
 	del_from_db = False
 
@@ -55,28 +56,31 @@ async def webhook_db(request: Request, db: Session = Depends(get_db)):
 		#we need to specifically catch 'closed' event in elif branch because a pr/issue has multiple states like opened/closed/assigned, but we are only concerned with 'closed', so that we can delete the row once the pr/issue gets closed
 		elif payload.get("action") == "closed":
 			del_from_db = True
-
-	db.add(EventData(
-		payload=payload,
-		user_id=github_user_id,
-		repo_id=repo_id,
-		trigger_event=trigger_event,
-		event_occurred_at=event_occurred_at
-		)
-	)
-
-	if enter_to_db:
-		db.add(ActiveRepoItems(
+	try:
+		db.add(EventData(
+			delivery_id=delivery_id,
+			payload=payload,
 			user_id=github_user_id,
 			repo_id=repo_id,
-			item_num=item_num,
-			event_type=trigger_event
+			trigger_event=trigger_event,
+			event_occurred_at=event_occurred_at
 			)
 		)
 
-	if del_from_db:
-		obj = db.query(ActiveRepoItems).filter(ActiveRepoItems.user_id == github_user_id, ActiveRepoItems.repo_id == repo_id, ActiveRepoItems.item_num == item_num).delete()
+		if enter_to_db:
+			db.add(ActiveRepoItems(
+				user_id=github_user_id,
+				repo_id=repo_id,
+				item_num=item_num,
+				event_type=trigger_event
+				)
+			)
 
-	db.commit()
+		if del_from_db:
+			obj = db.query(ActiveRepoItems).filter(ActiveRepoItems.user_id == github_user_id, ActiveRepoItems.repo_id == repo_id, ActiveRepoItems.item_num == item_num).delete()
+
+		db.commit()
+	except IntegrityError:
+		db.rollback()
 
 	return JSONResponse(content="payload saved successfully", status_code=status.HTTP_200_OK)

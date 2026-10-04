@@ -23,7 +23,8 @@ export default function () {
     const response = http.post('http://localhost:8000/webhook-payload', JSON.stringify(body), {
         headers: {
           'Content-Type': 'application/json', 
-          'X-Github-Event': 'push' 
+          'X-GitHub-Event': 'push',
+          'X-GitHub-Delivery': uniqueId 
         },
     })
   check(response, { 'is ok': (r) => r.status === 200 })

@@ -4,6 +4,7 @@ from confluent_kafka import Consumer
 from database import sessionLocal
 from models import EventData, ActiveRepoItems
 from datetime import datetime, UTC
+from sqlalchemy.exc import IntegrityError
 
 class GracefulKiller:
 	kill_now = False
@@ -40,8 +41,8 @@ while not killer.kill_now:
 
 	github_user_id = payload["repository"]["owner"]["id"]
 	repo_id = payload["repository"]["id"]
-	trigger_event = header[0][1].decode('utf-8') #since the event itself will be in byte format converting into string
-
+	trigger_event = header[0][1].decode('utf-8') #since the event itself will be in byte format, converting into string
+	delivery_id = header[1][1].decode('utf-8')
 	#need these two flags to decide whether to add or delete pr and issues event to the ActiveRepoItems table
 	enter_to_db = False
 	del_from_db = False
@@ -88,29 +89,34 @@ while not killer.kill_now:
 
  
 	with sessionLocal() as db:
-		db.add(EventData(
-			payload=payload, 
-			user_id=github_user_id, 
-			repo_id=repo_id, 
-			trigger_event=trigger_event,
-			event_occurred_at=event_occurred_at
-			)
-		)
-
-		db.flush()
-
-		if enter_to_db:
-			db.add(ActiveRepoItems(
-				user_id=github_user_id,
-				repo_id=repo_id,
-				item_num=item_num,
-				event_type=trigger_event
+		try:
+			db.add(EventData(
+				delivery_id=delivery_id,
+				payload=payload, 
+				user_id=github_user_id, 
+				repo_id=repo_id, 
+				trigger_event=trigger_event,
+				event_occurred_at=event_occurred_at
 				)
 			)
-		if del_from_db:
-			#chaining .delete() directly executes a single sql command without fetching the row first, this also performs the sql command in one network trip and ignores missing rows (like pre-existing prs) without throwing a NoneType error when i try to delete it after fetching
-			obj = db.query(ActiveRepoItems).filter(ActiveRepoItems.user_id == github_user_id, ActiveRepoItems.repo_id == repo_id, ActiveRepoItems.item_num == item_num).delete()
-		db.commit()
+
+			db.flush()
+
+			if enter_to_db:
+				db.add(ActiveRepoItems(
+					user_id=github_user_id,
+					repo_id=repo_id,
+					item_num=item_num,
+					event_type=trigger_event
+					)
+				)
+			if del_from_db:
+				#chaining .delete() directly executes a single sql command without fetching the row first, this also performs the sql command in one network trip and ignores missing rows (like pre-existing prs) without throwing a NoneType error when i try to delete it after fetching
+				obj = db.query(ActiveRepoItems).filter(ActiveRepoItems.user_id == github_user_id, ActiveRepoItems.repo_id == repo_id, ActiveRepoItems.item_num == item_num).delete()
+			db.commit()
+		except IntegrityError: #to prevent duplication, i have to do this, this coveres the scenario when db commit happens but consumer crashes before commiting the offset, then in that case once the consumer comes back, it will process the same event again, giving me two rows in EventData table, two prevent this we put unique constraint on delivery_id. If the code tries to commit the same event again, it will violate the integrity check and db commit will be rollback-ed
+			db.rollback()
+
 	consumer.commit(msg)
 		
 consumer.close()

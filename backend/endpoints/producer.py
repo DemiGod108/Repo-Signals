@@ -26,7 +26,7 @@ async def webhook_payload(request: Request):
 	repo_id = payload["repository"]["id"]
 	repo_name = payload["repository"]["name"]
 	event = request.headers.get("X-Github-Event")
-
+	delivery_id = request.headers.get("X-GitHub-Delivery")
 	#the kafka record should be in bytes so doing the following
 	kafka_record = json.dumps(payload).encode('utf-8')
 
@@ -34,7 +34,7 @@ async def webhook_payload(request: Request):
 
 	producer.produce(
 		topic=f"{repo_id}-{repo_name}",
-		headers={"event": event},
+		headers={"event": event, "delivery_id": delivery_id},
 		value=kafka_record,
 		callback=ack
 	)

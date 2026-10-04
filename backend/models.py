@@ -35,6 +35,7 @@ class EventData(Base):
 	__tablename__ = "event_data"
 
 	id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+	delivery_id: Mapped[str | None] = mapped_column(index=True, unique=True, nullable=True)
 	payload: Mapped[dict[str, Any]] = mapped_column()
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
 	repo_id: Mapped[int] = mapped_column()
@@ -48,7 +49,7 @@ class TrackedRepo(Base):
 	repo_id: Mapped[int] = mapped_column()
 	repo_name: Mapped[str] = mapped_column()
 	user_id: Mapped[int] = mapped_column(ForeignKey("users.github_id"))
-	hook_id: Mapped[int] = mapped_column()
+	hook_id: Mapped[int] = mapped_column() #required for deleting webhook i.e inorder to stop monitoring a particular repo
 	tracking_started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 	__table_args__ = (
